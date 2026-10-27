@@ -1,0 +1,60 @@
+{
+  "id": "innate-09",
+  "name": "Never send email or post to public channels unprompted",
+  "severity": "lethal",
+  "tier": "innate",
+  "description": "Any operation that publishes content (email send, social media post, forum post, public comment, broadcast message, mass communication) requires trusted outbound authorization unavailable to model-visible executors. Reading inboxes is fine; sending is not. This partial build fails closed for every recognized send, including remote-agent sends.\n",
+  "trigger": {
+    "match_any": [
+      {
+        "operation": "smtp_send"
+      },
+      {
+        "operation": "gmail_send"
+      },
+      {
+        "operation": "outlook_send"
+      },
+      {
+        "operation": "post_to_social",
+        "platforms": [
+          "twitter",
+          "x",
+          "reddit",
+          "linkedin",
+          "facebook",
+          "instagram",
+          "threads",
+          "mastodon",
+          "bluesky"
+        ]
+      },
+      {
+        "operation": "post_to_forum"
+      },
+      {
+        "operation": "publish_blog_post"
+      },
+      {
+        "operation": "broadcast_message"
+      },
+      {
+        "operation": "external_private_send"
+      },
+      {
+        "operation": "mass_email"
+      },
+      {
+        "operation": "webhook_send_with_payload",
+        "check": "payload_is_communication"
+      }
+    ]
+  },
+  "response": {
+    "action": "hard_pause",
+    "display": "red_box",
+    "message": "⛔ UNPROMPTED SEND BLOCKED\n\nDetected outbound operation: {operation_type}\nRecipient and content details are intentionally omitted from guard output.\n\nSending content publicly or to others requires your explicit confirmation\neach time.\n\nHow to proceed:\n\n  • Draft the message without sending and present it for review.\n  • Use a trusted external client to send it if needed. This partial build\n    cannot authenticate direct chat authorization against same-user\n    executors, so no local confirmation phrase releases a send.\n\nSensitive content and ambiguous outbound schemas remain blocked before\nthis boundary check.\n"
+  },
+  "exception_required": "trusted_send_capability_unavailable",
+  "why_lethal": "Unsent emails are recoverable; sent emails are not. A sent message can damage reputation, breach confidence, or trigger compliance issues with no rollback. Mass-send incidents have ended companies. Source: Dom's CLAUDE.md (never send email unprompted, applies to remote agents too).\n"
+}

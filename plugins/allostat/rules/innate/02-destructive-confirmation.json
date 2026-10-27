@@ -1,0 +1,185 @@
+{
+  "id": "innate-02",
+  "name": "Pause destructive commands without trusted authorization",
+  "severity": "lethal",
+  "tier": "innate",
+  "description": "Any command capable of permanent data loss requires trusted authorization unavailable to model-visible executors — shell deletion in every spelling, dd, truncate), git history/branch destruction, SQL drops, AND named destructive cloud operations (aws/gh/wrangler/stripe, keyed by service+subcommand, never by a bare verb). Operator authorization once is not standing authorization for future invocations. This partial build has no model-inaccessible local authorization boundary, so every matched action remains paused and must use a trusted external execution workflow.\n",
+  "trigger": {
+    "match_any": [
+      {
+        "command_pattern": "(?<!-)\\brm\\s+-[a-zA-Z]*[rf][a-zA-Z]*\\b",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "(?<!-)\\brm\\s+(-[a-zA-Z]*\\s+)*--(recursive|force)\\b",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "git\\s+reset\\s+--hard"
+      },
+      {
+        "command_pattern": "git\\s+push\\s+.*--force"
+      },
+      {
+        "command_pattern": "git\\s+push\\s+.*-f\\b"
+      },
+      {
+        "command_pattern": "git\\s+push\\s+[^|;&]*\\s\\+\\S"
+      },
+      {
+        "command_pattern": "git\\s+branch\\s+-D"
+      },
+      {
+        "command_pattern": "git\\s+clean\\s+-(f|x)"
+      },
+      {
+        "command_pattern": "git\\s+checkout\\s+(--(\\s|$)|\\.)"
+      },
+      {
+        "command_pattern": "git\\s+checkout(?=[^\\n;&|]*\\s(?:--force|-f)\\b)"
+      },
+      {
+        "command_pattern": "git\\s+restore\\s+\\."
+      },
+      {
+        "command_pattern": "DROP\\s+TABLE",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "DROP\\s+DATABASE",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "\\bTRUNCATE\\b",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "format\\s+/[a-zA-Z]:"
+      },
+      {
+        "command_pattern": "(?<!-)\\b(Remove-Item|ri|rm|rd|rmdir|del|erase)\\b[^|;&]*\\s-{1,2}r(e(c(u(r(s(e)?)?)?)?)?)?\\b",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "\\b(Get-ChildItem|gci)\\b[^;&]*\\s-{1,2}r(e(c(u(r(s(e)?)?)?)?)?)?\\b[^;&]*\\b(Remove-Item|ri|del|erase)\\b",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "\\[[^\\]]*Directory\\]::Delete",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "\\b(rd|rmdir)\\b(?=.*/s\\b)",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "\\bdel\\b(?=.*/s\\b)",
+        "case_sensitive": false
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*find\\s(?=[^\\n;&|]*\\s-delete\\b)"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*find\\s(?=[^\\n;&|]*\\s-exec\\s+(?:rm|shred)\\b)"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*shred\\s"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*truncate\\s(?=[^\\n;&|]*\\s(?:-s|--size))"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*mkfs(\\.\\w+)?\\b"
+      },
+      {
+        "command_pattern": "git\\s+branch(?=[^\\n;&|]*\\s-[a-zA-Z]*D\\b)"
+      },
+      {
+        "command_pattern": "git\\s+branch(?=[^\\n;&|]*\\s--delete\\b)(?=[^\\n;&|]*\\s--force\\b)"
+      },
+      {
+        "command_pattern": "git\\s+push(?=[^\\n;&|]*\\s(?:--delete|-d)\\b)"
+      },
+      {
+        "command_pattern": "git\\s+push\\s+[^\\n;&|]*\\s:\\S"
+      },
+      {
+        "command_pattern": "git\\s+stash\\s+(?:drop|clear)\\b"
+      },
+      {
+        "command_pattern": "git\\s+reflog\\s+expire"
+      },
+      {
+        "command_pattern": "git\\s+gc(?=[^\\n;&|]*\\s--prune)"
+      },
+      {
+        "command_pattern": "git\\s+update-ref(?=[^\\n;&|]*\\s-d\\b)"
+      },
+      {
+        "command_pattern": "git\\s+worktree\\s+remove(?=[^\\n;&|]*\\s--force\\b)"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?ec2\\s+(?:[^\\s;&|]+\\s+)*?(?:terminate-instances|delete-volume|delete-snapshot|deregister-image)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?rds\\s+(?:[^\\s;&|]+\\s+)*?delete-db-(?:instance|cluster|snapshot|cluster-snapshot)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?s3\\s+(?:[^\\s;&|]+\\s+)*?(?:rb|rm)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?s3api\\s+(?:[^\\s;&|]+\\s+)*?delete-(?:bucket|object|objects|bucket-policy)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?iam\\s+(?:[^\\s;&|]+\\s+)*?delete-(?:user|role|policy|group|instance-profile|access-key)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?kms\\s+(?:[^\\s;&|]+\\s+)*?(?:schedule-key-deletion|disable-key)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?backup\\s+(?:[^\\s;&|]+\\s+)*?delete-(?:backup-vault|backup-plan|recovery-point|backup-selection)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?logs\\s+(?:[^\\s;&|]+\\s+)*?delete-log-(?:group|stream)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?cloudformation\\s+(?:[^\\s;&|]+\\s+)*?delete-stack\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?dynamodb\\s+(?:[^\\s;&|]+\\s+)*?delete-table\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?ecr\\s+(?:[^\\s;&|]+\\s+)*?(?:delete-repository|batch-delete-image)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*gh\\s+repo\\s+delete\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*gh\\s+release\\s+delete\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*gh\\s+(?:secret|variable)\\s+(?:delete|remove)\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*gh\\s+api(?=[^\\n;&|]*\\s(?:-X|--method)[\\s=]+DELETE\\b)"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*wrangler\\s+(?:[^\\s;&|]+\\s+)*?delete\\b"
+      },
+      {
+        "command_pattern": "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*stripe\\s+\\w[\\w-]*\\s+delete\\b"
+      },
+      {
+        "command_pattern": "\\b(?:FLUSHALL|FLUSHDB)\\b",
+        "case_sensitive": false
+      }
+    ]
+  },
+  "response": {
+    "action": "hard_pause",
+    "display": "red_box",
+    "message": "⛔ DESTRUCTIVE COMMAND DETECTED — innate-02 fired\n\nCommand and target details are intentionally omitted from refusal text and\ntelemetry. Review them only in the original local tool request.\n\nWhy this fired: rule innate-02 matches commands capable of\npermanent data loss (rm -rf, force push, drop table, etc.).\nSee rules/innate/02-destructive-confirmation.yaml for the pattern set.\n\nHow to proceed:\n\n  Review the action and use a trusted external execution workflow if it is\n  genuinely necessary. This partial build cannot authenticate a local\n  confirmation against same-user executors, so no prompt phrase or\n  environment value releases the refusal.\n\nThe refusal observation stores only the action class, action digest, and\ntarget count. Command text, targets, environment values, credentials, and\nprivate paths are not stored in consent state or telemetry.\n\nIf unsure what's about to be deleted or lost, ask the agent to explain it\nbefore using the trusted external workflow.\n"
+  },
+  "exception_required": "trusted_destructive_capability_unavailable",
+  "why_lethal": "Lost work measured in hours-to-days of recovery. Force-pushed branches may overwrite teammates' commits. Dropped tables = data loss with no recovery without backups.\n"
+}

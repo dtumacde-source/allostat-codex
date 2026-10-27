@@ -1,0 +1,4 @@
+CANONICAL — this is the source-of-truth folder for the hypothalamic-axis
+pillar skill. Each pillar lives in its own folder under skills/; sibling
+folders (stress-response, innate-enforcer, etc.) are distinct pillars,
+NOT duplicates of this content. PATCH-102.

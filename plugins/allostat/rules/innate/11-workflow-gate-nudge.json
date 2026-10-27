@@ -1,0 +1,48 @@
+{
+  "id": "innate-11",
+  "name": "Workflow gate nudge",
+  "severity": "high",
+  "tier": "innate",
+  "status": "active",
+  "added_in_version": "0.2.0",
+  "added_at": "2026-05-02",
+  "description": "Decision gates declared in workflow_*.md files are treated as innate-tier\nhard pauses. The regulator does not allow the work to cross a phase boundary\nwithout explicit operator approval of that phase's gate criteria.\n\nOrigin: an autonomous multi-vertical predeployment session scaffolded\nmultiple Phase deliverables of a workflow_*.md without firing any of\nthe workflow's own declared decision gates. The gates were WRITTEN but\nnever ENFORCED. Operator then had to backfill review of dozens of\nunchecked decision items across the deliverable set.\n\nThis rule treats workflow-declared gates as enforceable to prevent\nrecurrence.\n",
+  "trigger": {
+    "match_any": [
+      {
+        "signal": "about_to_advance_phase",
+        "context": "workflow_in_play"
+      },
+      {
+        "signal": "about_to_apply_phase_deliverable",
+        "context": "gate_unapproved"
+      }
+    ],
+    "detection_logic": "The hypothalamic-axis skill calls lib/workflow_gates.surface_workflow_gates()\non operator message + project memory. If a workflow file is in play AND its\ngates have been parsed, the regulator tracks which phase the work is at.\nWhen work attempts to advance to a phase whose entry-gate hasn't been\napproved, this rule fires.\n\nPhase tracking heuristics (v1 — coarse):\n  - Operator says \"phase 1 complete\" / \"phase 2 ready\" / \"moving to phase N\"\n    → mark phase N gate as needing approval before phase N+1 work begins\n  - Phase name appears in observation-event details\n  - Operator explicitly approves: \"approve <phase> gate\"\n"
+  },
+  "response": {
+    "action": "hard_pause",
+    "display": "red_box",
+    "message": "{{format_gate_pause(gate)}}\n"
+  },
+  "failure_mode_prevented": {
+    "description": "Phase-boundary gate skipping. Producing 8 deliverables × 2 verticals\nof unreviewed work, then asking operator to backfill review.\n",
+    "cost": "Operator must read every deliverable cold to verify the autonomous\nwork didn't drift from their preferences. The original purpose of\ndecision gates is to interleave operator approval with autonomous\nwork so review is incremental, not retrospective.\n"
+  },
+  "related_rules": [
+    "innate-04",
+    "innate-10"
+  ],
+  "implementation": {
+    "lib_module": "lib/workflow_gates.py",
+    "parser_strategy": [
+      "structured_table",
+      "inline_mention"
+    ],
+    "surface_helpers": [
+      "format_gates_overview",
+      "format_gate_pause"
+    ]
+  },
+  "scope": "universal"
+}

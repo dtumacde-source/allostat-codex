@@ -1,0 +1,86 @@
+id: innate-05
+name: Handoff checkpoints — gentle advisory at 50k/150k/300k/500k, hard red-box cutoff at 700k/750k
+severity: high
+tier: innate
+description: >
+  When session token usage crosses 50k, 150k, 300k, 500k, 700k, or 750k
+  absolute tokens, surface a handoff checkpoint. D2 (pillar-wiring 2026-06-05)
+  split the ladder by severity per operator decision: 50k–500k are GENTLE
+  advisory nudges (plain text, a handoff suggestion + a relevant skill hint —
+  the skill-hint guidance folded in from the retired compose_metabolism_nudge
+  duplicate); 700k and 750k stay the STRONG red-box hard cutoff ("stop, write
+  the handoff now, open a new session"). Each threshold fires at most once per
+  session. Token counts come from the transcript JSONL via
+  scripts/token_check.py — always available, no usage-meter dependency.
+
+  Every template keeps the "HANDOFF CHECKPOINT — Nk" marker so the wrapper's
+  once-per-band suppression (user-prompt-submit.py regex) records the surfaced
+  band unchanged.
+
+  Migrated from percentage-based thresholds (33/50/75/90%) per operator
+  directive 2026-05-03: "Address threshold, no longer percentages, thresholds
+  are now token # gated." The free-radical biological metaphor — token
+  accumulation is mitochondrial ROS buildup; sweeps are antioxidant clearance;
+  absolute counts (not percentages) are the natural unit because ROS damage
+  scales with molecule count, not fraction of cellular capacity.
+trigger:
+  match_any:
+    - signal: usage_threshold_crossed
+      threshold: 50000
+    - signal: usage_threshold_crossed
+      threshold: 150000
+    - signal: usage_threshold_crossed
+      threshold: 300000
+    - signal: usage_threshold_crossed
+      threshold: 500000
+    - signal: usage_threshold_crossed
+      threshold: 700000
+    - signal: usage_threshold_crossed
+      threshold: 750000
+response:
+  action: prepend_to_reply
+  display: red_box
+  templates:
+    50000: |
+      HANDOFF CHECKPOINT — 50k tokens. Early checkpoint, informational only.
+      If this is deep work, you can ask me to write a handoff now.
+    150000: |
+      HANDOFF CHECKPOINT — 150k tokens. If this session covers important work,
+      consider asking me to write a handoff soon.
+    300000: |
+      HANDOFF CHECKPOINT — 300k tokens. Consider a handoff in the next ~100k so
+      the next session picks up without loss. → prefer concise responses.
+    500000: |
+      HANDOFF CHECKPOINT — 500k tokens. Write a handoff this turn — next-session
+      bootstrap quality drops past here. → superpowers:writing-plans before more
+      new code.
+    700000: |
+      ╔══════════════════════════════════════════════════════════════╗
+      ║ ⛔  HANDOFF CHECKPOINT — 700k — CUTOFF APPROACH  ⛔         ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  Status: CUTOFF APPROACH — NEXT NON-HOUSEKEEPING ACTION      ║
+      ║          WILL BE REFUSED                                     ║
+      ║  Action: Write the handoff IMMEDIATELY. Only housekeeping    ║
+      ║          (handoff doc, memory sweep) is allowed past 700k.  ║
+      ║  Trigger phrase: "write a handoff for this session"          ║
+      ╚══════════════════════════════════════════════════════════════╝
+    750000: |
+      ╔══════════════════════════════════════════════════════════════╗
+      ║ ⛔  FINAL CUTOFF — 750k TOKENS — OPEN NEW SESSION  ⛔       ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  Status: FINAL CUTOFF REACHED                                ║
+      ║  Action: Open a new session and load the handoff doc.       ║
+      ║          This session refuses all non-housekeeping work.    ║
+      ║  Trigger phrase: "/loadhandoff" in next session              ║
+      ╚══════════════════════════════════════════════════════════════╝
+fire_once_per_session: true
+absent_signal_fallback: |
+  Token counts are always available via scripts/token_check.py reading
+  the transcript JSONL — no fallback needed. If token_check fails, the
+  hook surfaces a structured error rather than silently dropping.
+why_high: >
+  Handoff quality drops as token volume climbs. 50k–500k are gentle so the
+  early ladder informs without alarm; 700k/750k escalate to a hard red-box so
+  the operator never hits a cutoff without a written handoff in hand. Volume-
+  based thresholds (vs percentage) ensure the rule fires reliably — there is no
+  harness-level usage-meter dependency.

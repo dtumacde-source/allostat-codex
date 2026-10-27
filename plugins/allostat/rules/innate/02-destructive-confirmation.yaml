@@ -1,0 +1,220 @@
+id: innate-02
+name: Pause destructive commands without trusted authorization
+severity: lethal
+tier: innate
+description: >
+  Any command capable of permanent data loss requires trusted authorization
+  unavailable to model-visible executors — shell deletion in every spelling,
+  dd, truncate), git history/branch destruction, SQL drops, AND named
+  destructive cloud operations (aws/gh/wrangler/stripe, keyed by
+  service+subcommand, never by a bare verb). Operator authorization once is
+  not standing authorization for future invocations. This partial build has no
+  model-inaccessible local authorization boundary, so every matched action
+  remains paused and must use a trusted external execution workflow.
+trigger:
+  match_any:
+    # Recursive/forced `rm`, EVERY spelling (2026-07-21).
+    #
+    # This used to be the two literal strings `rm\s+-rf` and `rm\s+-fr`, so
+    # `rm -r dir`, `rm -f -r dir`, `rm -rvf dir`, `rm -Rf dir` and
+    # `rm --recursive --force dir` all passed a LETHAL gate in silence. The
+    # DEGRADED fallback in lib/innate_rules.py (_FALLBACK_DESTRUCTIVE_PATTERNS)
+    # already caught all of them, which meant a customer whose ruleset was
+    # CORRUPT was better protected than one whose ruleset was healthy. The
+    # armed rule now uses the fallback's own form, so the armed set is a
+    # superset of the degraded set (asserted by
+    # tests/test_innate02_recursive_delete_spellings.py).
+    # The `(?<!-)` keeps `docker build --rm -f Dockerfile .` (a real, common,
+    # non-destructive command) out of a LETHAL gate.
+    - command_pattern: "(?<!-)\\brm\\s+-[a-zA-Z]*[rf][a-zA-Z]*\\b"
+      case_sensitive: false
+    - command_pattern: "(?<!-)\\brm\\s+(-[a-zA-Z]*\\s+)*--(recursive|force)\\b"
+      case_sensitive: false
+    - command_pattern: "git\\s+reset\\s+--hard"
+    - command_pattern: "git\\s+push\\s+.*--force"
+    - command_pattern: "git\\s+push\\s+.*-f\\b"
+    # Refspec force-push (2026-07-21). `git push origin +main` is a complete
+    # force push — it is the form git's own documentation uses — and neither
+    # flag pattern above sees it. why_lethal names overwriting teammates'
+    # commits as the reason this rule is lethal; the `+` spelling does exactly
+    # that.
+    - command_pattern: "git\\s+push\\s+[^|;&]*\\s\\+\\S"
+    - command_pattern: "git\\s+branch\\s+-D"
+    - command_pattern: "git\\s+clean\\s+-(f|x)"
+    # checkout, split in two (2026-08-02). The single entry here used to be
+    # `git\s+checkout\s+(--|\.)`, whose `--` alternative had no boundary. It
+    # therefore matched the leading `--` of EVERY long flag — `--detach`,
+    # `--track`, `--orphan` — none of which discard anything, while `-f`, the
+    # short spelling of the one flag that DOES throw away uncommitted work,
+    # matched nothing at all. The guard was refusing the safe forms and
+    # waving the destructive one through.
+    #
+    # This is NOT the round-10 quoted-prose boundary that
+    # test_legacy_patterns_still_overconfirm pins; that boundary is untouched
+    # and these two entries stay unanchored in the same way. The trade round
+    # 10 accepted was over-confirmation, never under-confirmation, so closing
+    # `-f` is what that record actually asks for.
+    #
+    # 1. the pathspec separator (`git checkout -- <path>`) and `git checkout .`
+    #    — both discard working-tree changes.
+    - command_pattern: "git\\s+checkout\\s+(--(\\s|$)|\\.)"
+    # 2. force in either spelling, anywhere in the command, since `git checkout
+    #    <branch> -f` is as destructive as `-f <branch>`.
+    - command_pattern: "git\\s+checkout(?=[^\\n;&|]*\\s(?:--force|-f)\\b)"
+    - command_pattern: "git\\s+restore\\s+\\."
+    - command_pattern: "DROP\\s+TABLE"
+      case_sensitive: false
+    - command_pattern: "DROP\\s+DATABASE"
+      case_sensitive: false
+    # Word-bounded (R3 follow-up, 2026-07-20). This was a bare unanchored
+    # "TRUNCATE" with case_sensitive: false, so the ordinary English words
+    # "truncated", "truncating" and "truncation" fired a LETHAL rule. Observed
+    # live three times in one session, twice on `git commit` messages that were
+    # describing a truncated file, and once on a `grep` for this very pattern.
+    # False positives are the top usability risk for this guard: an operator who
+    # learns the red box is usually wrong is an operator who stops reading it.
+    # The trailing \b excludes every English inflection while keeping the bare
+    # SQL statement, which is the thing worth confirming.
+    - command_pattern: "\\bTRUNCATE\\b"
+      case_sensitive: false
+    - command_pattern: "format\\s+/[a-zA-Z]:"
+    # Windows forms (2026-07-06, codex slice-5 live-validation finding):
+    # Windows agents compose PowerShell/cmd deletes — Codex's shell IS
+    # powershell.exe, and Claude Code has a PowerShell tool — so the
+    # bash-only set silently missed them. Same bar as `rm -rf`:
+    # recursive/forced deletes confirm; plain single-file deletes don't.
+    #
+    # Widened 2026-07-21. The old pattern was
+    #   \b(Remove-Item|rm|ri)\b(?=.*-Recurse\b)(?=.*-Force\b)
+    # which required the two parameters spelled out IN FULL and required BOTH.
+    # PowerShell accepts any unambiguous parameter PREFIX and several aliases,
+    # so `Remove-Item -r -fo x`, `Remove-Item -rec -fo x`,
+    # `del -Recurse -Force x`, `rd -Recurse -Force x`,
+    # `erase -Recurse -Force x` and `Remove-Item -Recurse x` (no -Force at all —
+    # it still deletes the tree) every one passed the gate. This is the
+    # operator's own shell and every Windows customer's.
+    # `(?<!-)` so a FLAG spelled `-ri` / `-del` is not read as the cmdlet name.
+    - command_pattern: "(?<!-)\\b(Remove-Item|ri|rm|rd|rmdir|del|erase)\\b[^|;&]*\\s-{1,2}r(e(c(u(r(s(e)?)?)?)?)?)?\\b"
+      case_sensitive: false
+    # `Get-ChildItem -Recurse <path> | Remove-Item` — the pipeline spelling of a
+    # recursive delete. The verb and the -Recurse live in different segments, so
+    # the single-segment pattern above cannot see it.
+    - command_pattern: "\\b(Get-ChildItem|gci)\\b[^;&]*\\s-{1,2}r(e(c(u(r(s(e)?)?)?)?)?)?\\b[^;&]*\\b(Remove-Item|ri|del|erase)\\b"
+      case_sensitive: false
+    # .NET recursive directory delete reachable from PowerShell.
+    - command_pattern: "\\[[^\\]]*Directory\\]::Delete"
+      case_sensitive: false
+    - command_pattern: "\\b(rd|rmdir)\\b(?=.*/s\\b)"
+      case_sensitive: false
+    - command_pattern: "\\bdel\\b(?=.*/s\\b)"
+      case_sensitive: false
+    # ------------------------------------------------------------------
+    # DESTRUCTIVE-OPERATION REGISTRY (2026-08-01, advisor H-03).
+    #
+    # Measured in one live session: this rule refused `rm -f` on a scratch
+    # file and said nothing about `find /etc/default ... -delete` (154
+    # credential files), `aws ec2 delete-volume`, or `aws rds
+    # delete-db-instance --skip-final-snapshot --delete-automated-backups`.
+    # The rule was an enumeration of spellings, so anything that destroys
+    # data with a spelling not on the list passed — and `git branch -q -D`
+    # passed because a cosmetic -q sat between the words the pattern
+    # expected to be adjacent.
+    #
+    # The entries below are a REGISTRY, not a word matcher: each is keyed on
+    # executable + service/subcommand + destructive flags (the advisor's
+    # explicit shape — a bare `delete` matcher over-blocks ordinary data
+    # operations and trains wholesale disabling). Two mechanics shared by
+    # all of them:
+    #
+    #   * COMMAND-POSITION ANCHOR: `(?:^|[\n;&|`]|\$\()` plus optional
+    #     sudo/command/env/VAR= prefixes. The executable must appear where a
+    #     command can actually start, so `echo "aws rds delete-db-instance"`
+    #     and a commit message QUOTING a dangerous string do not fire.
+    #     (The legacy entries above are deliberately unanchored — round-10
+    #     accepted their over-confirmation; nothing here relaxes them.)
+    #   * LOOKAHEAD FLAGS: destructive flags are matched with (?=[^\n;&|]*…)
+    #     inside the same pipeline segment, so flag ORDER and POSITION never
+    #     matter again. `git branch -q -D x`, `git branch x -D` and
+    #     `git branch -qD x` are the same operation and now the same match.
+    #
+    # Local filesystem — deletion that is not spelled `rm`:
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*find\\s(?=[^\\n;&|]*\\s-delete\\b)"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*find\\s(?=[^\\n;&|]*\\s-exec\\s+(?:rm|shred)\\b)"
+    # shred/truncate/mkfs carry the same command-position anchor as every
+    # other registry entry — `printf '%s' shred ...` is an argument, not a
+    # command, and the m08 decoy tests pin exactly that distinction.
+    # dd is deliberately ABSENT from this registry: `dd of=<target>` is
+    # already extracted by _bash_write_targets and routed through the
+    # sandbox deny gate and the path-based innate rules (the C2 machinery),
+    # which see the TARGET — a strictly better basis than the spelling.
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*shred\\s"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*truncate\\s(?=[^\\n;&|]*\\s(?:-s|--size))"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*mkfs(\\.\\w+)?\\b"
+    # git — the spellings the adjacency patterns above cannot see:
+    - command_pattern: "git\\s+branch(?=[^\\n;&|]*\\s-[a-zA-Z]*D\\b)"
+    - command_pattern: "git\\s+branch(?=[^\\n;&|]*\\s--delete\\b)(?=[^\\n;&|]*\\s--force\\b)"
+    - command_pattern: "git\\s+push(?=[^\\n;&|]*\\s(?:--delete|-d)\\b)"
+    - command_pattern: "git\\s+push\\s+[^\\n;&|]*\\s:\\S"
+    - command_pattern: "git\\s+stash\\s+(?:drop|clear)\\b"
+    - command_pattern: "git\\s+reflog\\s+expire"
+    - command_pattern: "git\\s+gc(?=[^\\n;&|]*\\s--prune)"
+    - command_pattern: "git\\s+update-ref(?=[^\\n;&|]*\\s-d\\b)"
+    - command_pattern: "git\\s+worktree\\s+remove(?=[^\\n;&|]*\\s--force\\b)"
+    # aws — named service + subcommand, never a bare verb (protective
+    # subcommands like `cancel-key-deletion` must NOT fire):
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?ec2\\s+(?:[^\\s;&|]+\\s+)*?(?:terminate-instances|delete-volume|delete-snapshot|deregister-image)\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?rds\\s+(?:[^\\s;&|]+\\s+)*?delete-db-(?:instance|cluster|snapshot|cluster-snapshot)\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?s3\\s+(?:[^\\s;&|]+\\s+)*?(?:rb|rm)\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?s3api\\s+(?:[^\\s;&|]+\\s+)*?delete-(?:bucket|object|objects|bucket-policy)\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?iam\\s+(?:[^\\s;&|]+\\s+)*?delete-(?:user|role|policy|group|instance-profile|access-key)\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?kms\\s+(?:[^\\s;&|]+\\s+)*?(?:schedule-key-deletion|disable-key)\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?backup\\s+(?:[^\\s;&|]+\\s+)*?delete-(?:backup-vault|backup-plan|recovery-point|backup-selection)\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?logs\\s+(?:[^\\s;&|]+\\s+)*?delete-log-(?:group|stream)\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?cloudformation\\s+(?:[^\\s;&|]+\\s+)*?delete-stack\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?dynamodb\\s+(?:[^\\s;&|]+\\s+)*?delete-table\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*aws\\s+(?:[^\\s;&|]+\\s+)*?ecr\\s+(?:[^\\s;&|]+\\s+)*?(?:delete-repository|batch-delete-image)\\b"
+    # gh — repo/release/secret destruction and the raw DELETE verb:
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*gh\\s+repo\\s+delete\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*gh\\s+release\\s+delete\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*gh\\s+(?:secret|variable)\\s+(?:delete|remove)\\b"
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*gh\\s+api(?=[^\\n;&|]*\\s(?:-X|--method)[\\s=]+DELETE\\b)"
+    # wrangler — its delete verbs are uniformly destructive (worker, kv key,
+    # r2 bucket/object, d1, pages project), so the key is exe + verb:
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*wrangler\\s+(?:[^\\s;&|]+\\s+)*?delete\\b"
+    # stripe CLI — resource deletion:
+    - command_pattern: "(?:^|[\\n;&|`]|\\$\\()\\s*(?:sudo\\s+(?:-\\w+\\s+)*)?(?:command\\s+)?(?:env\\s+)?(?:\\w+=\\S*\\s+)*stripe\\s+\\w[\\w-]*\\s+delete\\b"
+    # redis — one word erases every key in the store (ALLOSTAT_REDIS_URL is
+    # live infrastructure). Same class as DROP TABLE above:
+    - command_pattern: "\\b(?:FLUSHALL|FLUSHDB)\\b"
+      case_sensitive: false
+response:
+  action: hard_pause
+  display: red_box
+  message: |
+    ⛔ DESTRUCTIVE COMMAND DETECTED — innate-02 fired
+
+    Command and target details are intentionally omitted from refusal text and
+    telemetry. Review them only in the original local tool request.
+
+    Why this fired: rule innate-02 matches commands capable of
+    permanent data loss (rm -rf, force push, drop table, etc.).
+    See rules/innate/02-destructive-confirmation.yaml for the pattern set.
+
+    How to proceed:
+
+      Review the action and use a trusted external execution workflow if it is
+      genuinely necessary. This partial build cannot authenticate a local
+      confirmation against same-user executors, so no prompt phrase or
+      environment value releases the refusal.
+
+    The refusal observation stores only the action class, action digest, and
+    target count. Command text, targets, environment values, credentials, and
+    private paths are not stored in consent state or telemetry.
+
+    If unsure what's about to be deleted or lost, ask the agent to explain it
+    before using the trusted external workflow.
+exception_required: trusted_destructive_capability_unavailable
+why_lethal: >
+  Lost work measured in hours-to-days of recovery. Force-pushed branches
+  may overwrite teammates' commits. Dropped tables = data loss with no
+  recovery without backups.

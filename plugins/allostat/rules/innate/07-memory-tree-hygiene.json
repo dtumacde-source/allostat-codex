@@ -1,0 +1,70 @@
+{
+  "id": "innate-07",
+  "name": "Memory tree hygiene — auto-sort + auto-merge on file creation",
+  "severity": "medium",
+  "tier": "innate",
+  "description": "Whenever a new memory file is created, the same turn must also do three checks: sort (correct location in tree), merge (>50% overlap with existing files = consolidate), and update parent (project files maintain Related rules sections pointing at sub-files).\n",
+  "trigger": {
+    "match_any": [
+      {
+        "signal": "new_memory_file_created",
+        "action": "post_create"
+      }
+    ]
+  },
+  "response": {
+    "action": "run_hygiene_protocol",
+    "display": "chat_summary",
+    "protocol": [
+      {
+        "step": "sort",
+        "action": "classify_file",
+        "categories": [
+          "project_specific",
+          "cross_cutting",
+          "global"
+        ],
+        "output": "place_index_entry_in_correct_location"
+      },
+      {
+        "step": "merge_check",
+        "action": "scan_for_overlap",
+        "threshold": 50,
+        "action_if_overlap": "propose_merge_into_existing"
+      },
+      {
+        "step": "update_parent",
+        "action": "bidirectional_cross_reference",
+        "condition": "file_is_project_specific",
+        "target": "relevant_project_*.md_Related_rules_section"
+      }
+    ]
+  },
+  "manual_triggers": [
+    {
+      "phrase": "#sort-memory",
+      "action": "full_audit_sort_pass"
+    },
+    {
+      "phrase": "sort memory",
+      "action": "full_audit_sort_pass"
+    },
+    {
+      "phrase": "#merge-memory",
+      "action": "scan_for_overlap_propose_merges"
+    },
+    {
+      "phrase": "merge memory",
+      "action": "scan_for_overlap_propose_merges"
+    },
+    {
+      "phrase": "#audit-memory",
+      "action": "combined_sort_merge_staleness_check"
+    },
+    {
+      "phrase": "memory audit",
+      "action": "combined_sort_merge_staleness_check"
+    }
+  ],
+  "why_medium": "Memory files accumulate and rot without hygiene. Operator prefers fewer, denser files over many small overlapping files. Drift creates duplicate rules that conflict.\n"
+}

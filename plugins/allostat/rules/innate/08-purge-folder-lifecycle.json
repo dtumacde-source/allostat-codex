@@ -1,0 +1,54 @@
+{
+  "id": "innate-08",
+  "name": "PURGE folder lifecycle — archival staging (no deletion)",
+  "severity": "medium",
+  "tier": "innate",
+  "description": "Monthly sweep (or on operator command \"purge legacy files\") moves every *_LEGACY_* file/folder older than 30 days into ~/Desktop/_PURGE/YYYYMMDD/. _PURGE/ is permanent cold storage — nothing is ever deleted from it (operator directive: archive, never destroy). Sweep does not run automatically — operator must invoke. Auto-sweeps risk losing files the operator intended to reference.\n",
+  "trigger": {
+    "match_any": [
+      {
+        "phrase": "purge legacy files",
+        "action": "run_sweep"
+      },
+      {
+        "phrase": "run the purge sweep",
+        "action": "run_sweep"
+      },
+      {
+        "signal": "workspace_cluttered_with_old_LEGACY_files",
+        "action": "surface_trigger_phrase_to_operator"
+      }
+    ]
+  },
+  "response": {
+    "action": "run_sweep_with_summary",
+    "display": "chat_summary",
+    "protocol": [
+      {
+        "step": "scan",
+        "action": "find files matching *_LEGACY_* across operator's typical project roots",
+        "filter": "mtime older than 30 days",
+        "target_paths": [
+          "~/Desktop/",
+          "~/Downloads/",
+          "~/Documents/"
+        ]
+      },
+      {
+        "step": "summary",
+        "action": "print count + total size + oldest/newest mtime + sample paths",
+        "gate": "operator must confirm before move"
+      },
+      {
+        "step": "move",
+        "destination": "~/Desktop/_PURGE/YYYYMMDD/",
+        "ymd": "today_date"
+      },
+      {
+        "step": "list",
+        "action": "show contents of new _PURGE/YYYYMMDD/ subfolder after move"
+      }
+    ]
+  },
+  "why_medium": "LEGACY files accumulate in the active tree otherwise. Two-step lifecycle (rollout archival → 30-day move to _PURGE cold storage) keeps the active workspace tidy. Archive is terminal — nothing is ever deleted; disk is abundant, so there is no deletion step. (The former \"60-day rm -rf\" stage was struck 2026-07-08 per operator directive: archive, never destroy.)\n"
+}

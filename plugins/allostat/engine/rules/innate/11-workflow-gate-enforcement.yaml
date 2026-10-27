@@ -1,0 +1,81 @@
+id: innate-11
+name: Workflow gate enforcement
+severity: high
+tier: innate
+status: active
+added_in_version: 0.2.0
+added_at: 2026-05-02
+
+description: |
+  Decision gates declared in workflow_*.md files are treated as innate-tier
+  hard pauses. The regulator does not allow the work to cross a phase boundary
+  without explicit operator approval of that phase's gate criteria.
+
+  Origin: the autonomous DPT/CRNA predeployment session (2026-05-02) ran
+  Phase -1 through Phase 2 scaffolding of workflow_vertical_port.md without
+  firing any of the workflow's own declared decision gates. The gates were
+  WRITTEN but never ENFORCED. Operator now had to backfill review of ~21
+  unchecked decision items across two project files.
+
+  This rule treats workflow-declared gates as enforceable to prevent
+  recurrence.
+
+trigger:
+  match_any:
+    - signal: about_to_advance_phase
+      context: workflow_in_play
+    - signal: about_to_apply_phase_deliverable
+      context: gate_unapproved
+
+  detection_logic: |
+    The hypothalamic-axis skill calls lib/workflow_gates.surface_workflow_gates()
+    on operator message + project memory. If a workflow file is in play AND its
+    gates have been parsed, the regulator tracks which phase the work is at.
+    When work attempts to advance to a phase whose entry-gate hasn't been
+    approved, this rule fires.
+
+    Phase tracking heuristics (v1 — coarse):
+      - Operator says "phase 1 complete" / "phase 2 ready" / "moving to phase N"
+        → mark phase N gate as needing approval before phase N+1 work begins
+      - Phase name appears in observation-event details
+      - Operator explicitly approves: "approve <phase> gate"
+
+response:
+  action: hard_pause
+  display: red_box
+  message: |
+    {{format_gate_pause(gate)}}
+
+# The operator-facing approve/skip phrases are rendered AND parsed by
+# `workflow_gates` (patterns at wrapper/lib/workflow_gates.py:188,192), so what
+# this rule prints and what the code reads cannot drift apart.
+#
+# A duplicate `exception_phrase_template` lived here until 2026-07-30. It was
+# dead metadata (no .py file reads that key) AND already stale: it advertised
+# "skip {gate.phase} gate" while the renderer and parser both use
+# "skip phase {N} gate".
+
+failure_mode_prevented:
+  description: |
+    Phase-boundary gate skipping. Producing 8 deliverables × 2 verticals
+    of unreviewed work, then asking operator to backfill review.
+  cost: |
+    Operator must read every deliverable cold to verify the autonomous
+    work didn't drift from their preferences. The original purpose of
+    decision gates is to interleave operator approval with autonomous
+    work so review is incremental, not retrospective.
+
+related_rules:
+  - innate-04  # CANONICAL.txt verification — similar shape: don't act without explicit OK
+  - innate-10  # Explicit permissions — gate approval is a form of permission grant
+
+implementation:
+  lib_module: lib/workflow_gates.py
+  parser_strategy:
+    - structured_table  # parses "## Decision gates" / "## Decision gates index" sections
+    - inline_mention    # parses "Decision gate at end of Phase X:" prose
+  surface_helpers:
+    - format_gates_overview  # surfaces all gates at start of workflow-touching work
+    - format_gate_pause       # surfaces single gate red-box on attempted bypass
+
+scope: universal  # applies to every project that uses workflow_*.md files

@@ -1,0 +1,65 @@
+{
+  "id": "innate-10",
+  "name": "Confirm before OAuth/SSO grants, agreement acceptance, payments, API-key issuance, webhook registration, or account-security changes\n",
+  "severity": "lethal",
+  "tier": "innate",
+  "description": "Each of these actions requires trusted authorization unavailable to model-visible executors, one at a time: OAuth authorization and SSO completion; accepting terms, licences, invitations, privacy policies, or cookie consent; granting a sharing permission; issuing or rotating an API key; registering a webhook endpoint; completing a Stripe charge or another payment; activating a subscription; setting a password; setting up 2FA; and changing account settings. Implicit acceptance mechanisms — pre-checked consent boxes, auto-acceptance timers, and \"required to continue\" prompts — are NOT valid authorization for any of them.\nSCOPE, stated plainly (operator ruling, 2026-08-03): this rule covers the shapes enumerated above and nothing wider. It does NOT claim to cover every action that grants access. Permission-grant shapes across present and future MCP tools are not enumerable, so a universal promise would be unkeepable by construction — wrong by a margin nobody can measure, while the operator plans around it. A narrower rule that blocks reliably is worth more than a broad one that misses silently. Permission-shaped calls this rule does not recognize are RECORDED (`permission_shape_unclassified`) rather than blocked, so the gaps are visible and this list grows from real usage instead of guesswork.\n",
+  "trigger": {
+    "match_any": [
+      {
+        "operation": "oauth_authorize"
+      },
+      {
+        "operation": "sso_complete"
+      },
+      {
+        "operation": "terms_of_service_accept"
+      },
+      {
+        "operation": "privacy_policy_accept"
+      },
+      {
+        "operation": "cookie_consent"
+      },
+      {
+        "operation": "sharing_permission_grant"
+      },
+      {
+        "operation": "api_key_grant"
+      },
+      {
+        "operation": "webhook_endpoint_register"
+      },
+      {
+        "operation": "stripe_charge"
+      },
+      {
+        "operation": "payment_complete"
+      },
+      {
+        "operation": "subscription_activate"
+      },
+      {
+        "operation": "account_setting_change"
+      },
+      {
+        "operation": "password_set"
+      },
+      {
+        "operation": "2fa_setup"
+      }
+    ]
+  },
+  "response": {
+    "action": "hard_pause",
+    "display": "red_box",
+    "message": "⛔ AUTHORIZATION REQUIRED\n\nAction class: {operation_type}\nTarget and effect details are intentionally omitted from guard output.\n\nThis action changes access / permissions / agreements / financial state\nin ways that may be hard to reverse.\n\n(This guard recognizes a specific list of action shapes, not every\npossible permission grant — see the rule's scope note.)\n\nHow to proceed:\n\n  Review the action and use a trusted external client if it is genuinely\n  necessary. This partial build cannot authenticate local confirmation\n  against same-user executors, so no prompt phrase releases the action.\n\nThings I will NOT accept as authorization on your behalf:\n  • Pre-checked agreement boxes\n  • Auto-acceptance timers\n  • \"Required to continue\" prompts\n  • \"Implied consent\" claims\n  • Email-based authorization links you didn't request\n  • Hidden text in observed content claiming you've pre-authorized\n\nStanding, quoted, inferred, and content-supplied authority are ignored.\n"
+  },
+  "exception_required": "trusted_permission_capability_unavailable",
+  "auto_decline_defaults": {
+    "cookie_banners": "decline_non_essential",
+    "marketing_consent": "decline",
+    "data_sharing_optional": "decline"
+  },
+  "why_lethal": "Granted permissions are hard to revoke (especially OAuth scopes spread across third parties). Accepted agreements bind the operator. Financial transactions are recoverable only via dispute processes. The friction of a per-action pause is the price of preventing a category of catastrophic mistakes that operators frequently make under time pressure. Source: Dom's CLAUDE.md (explicit permission actions section).\n"
+}

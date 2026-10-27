@@ -1,0 +1,31 @@
+id: innate-06
+name: Three-pass design workflow before production code
+severity: medium
+tier: innate
+description: >
+  Operator's working preference is brainstorm → plan → execute. When operator
+  says "this is moving to production" or "let's start building," do not
+  interpret as "skip the plan." Confirm which pass you're in before touching
+  the filesystem. Default assumption is pass 1 unless explicitly named.
+trigger:
+  match_any:
+    - signal: about_to_write_production_code
+      check: pass_phase_unknown_or_unstated
+    - signal: scaffolding_files_or_creating_skill_logic
+      check: pass_3_not_explicitly_named
+response:
+  action: confirm_pass
+  display: chat_question
+  message: |
+    Quick check: are we in pass 3 yet, or still pass 1 / pass 2?
+
+    Pass 1 — Strategy / brainstorm: open exploration, design docs only
+    Pass 2 — Plan: concrete implementation plan, no production code
+    Pass 3 — Execute: build against the plan
+
+    Default to pass 1 unless you confirm otherwise.
+exception_required: explicit_pass_name_in_chat
+why_medium: >
+  Skipping passes 1-2 produces 15+ revision cycles before operator is satisfied.
+  Three deliberate passes produce a satisfactory product in fewer total cycles.
+  Source: Dom's CLAUDE.md, validated 2026-05-01.

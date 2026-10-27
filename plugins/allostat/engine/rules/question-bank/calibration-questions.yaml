@@ -1,0 +1,184 @@
+# Behavioral calibration interview — captures operator preferences across
+# the dimensions most likely to affect Allostat's regulation behavior.
+# Multiple-choice preferred (faster + cleaner imprinting); free-text fallback
+# for nuance.
+#
+# Each answered question maps to one or more imprinted YAML rules in the
+# operator's user-tier rules folder.
+#
+# Estimated time: 10-15 minutes for the full set.
+
+id: calibration-v1
+name: Behavioral calibration interview
+purpose: >
+  Capture operator's working preferences upfront so Allostat starts warm.
+  Solves the cold-start problem — the system has a meaningful preference
+  baseline before the first real session, instead of waiting for behavior
+  to accumulate.
+estimated_time_minutes: 12
+
+questions:
+
+  - id: calib-q1
+    domain: deliverable_polish
+    prompt: |
+      When I deliver work, do you prefer:
+    options:
+      a: One polished final deliverable, ready to use
+      b: Iterative drafts you can react to and shape
+      c: Raw output that you'll polish yourself
+    maps_to_rule: |
+      imprinted/deliverable-polish-preference.yaml
+      Sets default behavior for how I structure responses on substantive work.
+
+  - id: calib-q2
+    domain: correction_handling
+    prompt: |
+      When you correct me, should I:
+    options:
+      a: Explain why I made the mistake (so we both learn)
+      b: Just take the correction silently
+      c: Save the correction as a future rule (auto-promote at N=5)
+    maps_to_rule: |
+      imprinted/correction-handling-preference.yaml
+      Affects how I respond to operator corrections — apologetic vs silent
+      vs rule-promoting.
+
+  - id: calib-q3
+    domain: project_planning
+    prompt: |
+      When starting a new project, do you prefer:
+    options:
+      a: Talk it through with you, brainstorming style
+      b: Detailed written requirements first, then build
+      c: Build a v1 quickly, then iterate
+      d: Three-pass workflow (brainstorm → plan → execute)
+    maps_to_rule: |
+      imprinted/project-planning-style.yaml
+      Sets default workflow for new project initiation.
+
+  - id: calib-q4
+    domain: workflow_cadence
+    prompt: |
+      Roughly how many passes do you run on important work before shipping?
+    options:
+      a: 1 — direct to production
+      b: 2 — draft + polish
+      c: 3 — brainstorm + plan + execute
+      d: More than 3
+    maps_to_rule: |
+      imprinted/pass-count-preference.yaml
+      Affects how I time-box phases and when I expect us to ship.
+
+  - id: calib-q5
+    domain: roi_mental_model
+    prompt: |
+      When I propose a strategy move, lead with:
+    options:
+      a: Total revenue projection
+      b: ROI per hour of your time (lifestyle-business framing)
+      c: Competitive positioning / market angle
+      d: Compounding-asset value over time
+    maps_to_rule: |
+      imprinted/roi-presentation-preference.yaml
+      Affects how I frame strategy recommendations and projections.
+
+  - id: calib-q6
+    domain: risk_tolerance
+    prompt: |
+      For irreversible operations (deletes, force-pushes, sends, charges):
+    options:
+      a: Confirmation every single time, no exceptions
+      b: Confirmation only on shared / public / external state
+      c: Trust me unless I've said otherwise (rule applies once authorized)
+    maps_to_rule: |
+      imprinted/risk-tolerance-default.yaml
+      Affects whether innate-tier rules can be bypassed via standing
+      authorization or always require fresh confirmation.
+
+  - id: calib-q7
+    domain: voice_consistency
+    prompt: |
+      Should I match your voice in:
+    options:
+      a: All generated copy (about pages, blog posts, code comments, etc.)
+      b: Only public-facing copy (not internal notes / commit messages)
+      c: Only when you explicitly invoke a "write like me" mode
+    maps_to_rule: |
+      imprinted/voice-application-scope.yaml
+      Affects how aggressively I apply the voice reference across outputs.
+
+  - id: calib-q8
+    domain: time_horizon
+    prompt: |
+      Most of your active projects are:
+    options:
+      a: Shipping this month
+      b: Shipping this quarter
+      c: Ongoing without a release date
+      d: Mix of all three
+    maps_to_rule: |
+      imprinted/project-time-horizon.yaml
+      Affects how I prioritize, what I surface as "urgent," etc.
+
+  - id: calib-q9
+    domain: surface_preference
+    prompt: |
+      Do you prefer to receive proposals as:
+    options:
+      a: Inline chat suggestions
+      b: Red-box callouts when high-stakes
+      c: Separate planning documents
+      d: Mix — escalation by stakes
+    maps_to_rule: |
+      imprinted/proposal-surface-preference.yaml
+      Affects how I display proposed actions / rule promotions / etc.
+
+  - id: calib-q10
+    domain: cross_project_rules
+    prompt: |
+      Should rules I learn on one project:
+    options:
+      a: Auto-apply across all your projects (broadest)
+      b: Auto-apply only to linked projects (umbrella tier)
+      c: Stay project-scoped unless you explicitly promote them (most isolated)
+    maps_to_rule: |
+      imprinted/cross-project-rule-scope.yaml
+      Sets default for how aggressively pattern-observer promotes learned
+      rules across the archipelago.
+
+  - id: calib-q11
+    domain: deliverable_format
+    prompt: |
+      For strategic / analytical deliverables (market analyses, business
+      cases, plans), do you prefer:
+    options:
+      a: Polished PDF (brand-styled, professional)
+      b: Clean markdown (easy to edit, version-control friendly)
+      c: Whatever the situation calls for, you'll specify
+    maps_to_rule: |
+      imprinted/strategic-deliverable-format.yaml
+      Affects whether I default to PDF generation or markdown for
+      strategic analyses.
+
+  - id: calib-q12
+    domain: file_save_location
+    prompt: |
+      For one-off deliverables I generate (mockups, PDFs, exports, scripts):
+    options:
+      a: Default to my Downloads folder
+      b: Default to a project-specific folder
+      c: Ask me each time
+    maps_to_rule: |
+      imprinted/file-save-default.yaml
+      Affects where I save deliverables when no path is explicitly stated.
+
+post_capture:
+  output_directory: "{project_allostat_root}/rules/imprinted/"
+  output_format: yaml_per_rule
+  also_writes:
+    - "{project_allostat_root}/config.json"  # logs calibration date, completion status
+  re_run_triggers:
+    - operator_command: "/allostat calibrate"
+    - schedule: 90_days_since_last
+    - drift_signal: imprinted_preferences_diverge_from_observed_behavior_on_3_or_more_topics

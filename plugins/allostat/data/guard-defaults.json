@@ -1,0 +1,16 @@
+{
+  "schema": "allostat-release-guard-defaults/v1",
+  "rules": {
+    "innate-01": false,
+    "innate-02": true,
+    "innate-03": false,
+    "innate-04": false,
+    "innate-05": false,
+    "innate-06": false,
+    "innate-07": false,
+    "innate-08": false,
+    "innate-10": false,
+    "innate-11": false,
+    "innate-12": false
+  }
+}

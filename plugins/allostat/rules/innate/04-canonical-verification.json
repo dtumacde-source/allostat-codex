@@ -1,0 +1,28 @@
+{
+  "id": "innate-04",
+  "name": "CANONICAL.txt verification before editing files in multi-copy folders",
+  "severity": "lethal",
+  "tier": "innate",
+  "description": "When two or more folders contain similar files (e.g. site/ and site_v2/, or project/ and project_old/), the active edit folder must be marked with a CANONICAL.txt marker file. Allostat refuses to edit files in multi-copy contexts where no CANONICAL.txt is present, requiring the operator to confirm which copy is canonical.\n",
+  "trigger": {
+    "match_all": [
+      {
+        "operation": "edit",
+        "context": "file_being_edited_has_sibling_folders_with_similar_files"
+      },
+      {
+        "context": "no_CANONICAL_txt_in_current_folder_or_any_sibling"
+      }
+    ]
+  },
+  "response": {
+    "action": "hard_pause",
+    "display": "red_box",
+    "message": "⛔ CANONICAL FOLDER UNCLEAR\n\nFile about to be edited: {file_path}\nDetected sibling folders with similar files: {sibling_list}\n\nNone of these folders have a CANONICAL.txt marker. Editing the wrong\ncopy is one of the top causes of lost work.\n\nTo proceed, do ONE of:\n  1. Identify the canonical folder and verify its CANONICAL.txt marker,\n     then retry the exact edit in that verified folder.\n  2. Tell me a different folder is canonical, and I will redirect there.\n  3. Verify against the live URL or live artifact first when that is the\n     source of truth.\n\nA generic confirmation never chooses a source-of-truth folder.\n"
+  },
+  "secondary_response_on_proceed": {
+    "action": "write_canonical_marker",
+    "content": "This folder is the source of truth as of {today_date}.\nSet by operator confirmation during edit of {file_path}.\n"
+  },
+  "why_lethal": "Editing the stale copy of a multi-version artifact silently breaks the next deploy. The fix is hours of comparing versions. CANONICAL.txt costs one line of disk; preventing one wrong-folder-edit pays for it forever.\n"
+}

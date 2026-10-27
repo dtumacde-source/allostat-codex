@@ -1,0 +1,64 @@
+id: innate-03
+name: LEGACY archival on every rollout
+severity: lethal
+tier: innate
+description: >
+  When a rollout / deploy / new version of an asset ships (web zip uploaded,
+  PDF re-rendered, slide deck re-exported, package re-uploaded), every
+  superseded file in the prior source folder gets renamed with the suffix
+  _LEGACY_pre_YYYYMMDD_rollout (rollout date, not today's date). Files with
+  this suffix are read-only history. Never edited. Never used as deploy source.
+trigger:
+  match_any:
+    - context: post_deploy_detected
+      signal: "deploy artifact ships in folder X"
+    - context: post_upload_detected
+      signal: "wrangler publish / vercel deploy / netlify deploy / git push to deploy branch"
+    - context: post_export_detected
+      signal: "PDF re-rendered, deck re-exported, .docx re-saved as deliverable"
+    # W2-D: gate edit AND write (overwriting read-only history is at least
+    # as destructive as editing it). Reads are deliberately NOT gated —
+    # LEGACY files exist to be inspected for rollback (audit H-09: read-only
+    # tools used to arrive op-less and got hard-refused here).
+    - operation: [write, edit]
+      file_pattern: "**/*_LEGACY_*"
+      action: refuse_all
+response:
+  action: prompt_archival
+  display: red_box
+  message: |
+    📦 ROLLOUT ARCHIVAL REQUIRED
+
+    Detected: {rollout_event}
+    Folder with superseded files: {folder}
+
+    To preserve rollback safety, every prior file in that folder needs the
+    suffix _LEGACY_pre_{rollout_date}_rollout. I'll do this now unless you
+    redirect.
+
+    Files to archive: {file_list}
+    Rename pattern: foo.html → foo_LEGACY_pre_{rollout_date}_rollout.html
+
+    How to proceed:
+
+      Copy the intended changes forward to a new non-LEGACY filename, or tell
+      me which rollout/archive selection is wrong so I can redirect. Historical
+      files are never made writable by a generic confirmation.
+edit_protection:
+  pattern: "**/*_LEGACY_*"
+  action: hard_pause
+  message: |
+    ⛔ ATTEMPTED EDIT ON LEGACY FILE
+
+    File: {file_path}
+
+    Files marked _LEGACY_pre_*_rollout are read-only history. They exist
+    so you can roll back if a deploy goes wrong. Editing them defeats
+    that purpose.
+
+    If you genuinely need to edit, copy to a new filename first.
+why_lethal: >
+  Editing the wrong copy is one of the top causes of lost work in long
+  multi-folder projects. The LEGACY archival convention is the single
+  most-effective prevention across long-lived projects with multiple
+  deploy cycles.

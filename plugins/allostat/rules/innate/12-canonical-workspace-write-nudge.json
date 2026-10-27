@@ -1,0 +1,67 @@
+{
+  "id": "innate-12",
+  "name": "Canonical workspace write nudge",
+  "severity": "high",
+  "tier": "innate",
+  "status": "active",
+  "added_in_version": "0.2.0",
+  "added_at": "2026-05-02",
+  "description": "When the operator has declared a canonical workspace for a project (via\nCANONICAL.txt + project-pointer memory file like\nproject_<name>_workspace.md), strategic deliverables MUST be written to\nthat workspace, not to the Downloads folder.\n\nOrigin: an autonomous multi-vertical predeployment session wrote\nPhase deliverables to a Downloads subfolder first, then had to RELOCATE\nthem into the canonical repo workspace. The relocate was the right move;\nthe Downloads-first write was the wrong move.\n\nPer Allostat v2 Principle 5 (\"directory decisions at initiation, surfaced\nand locked, never left for discovery\"), the canonical workspace is supposed\nto be locked at session start. This rule enforces that lock at write time.\n",
+  "trigger": {
+    "match_any": [
+      {
+        "signal": "write_to_downloads",
+        "context": "canonical_workspace_declared",
+        "condition": "file_classifies_as_strategic_deliverable"
+      }
+    ],
+    "detection_logic": "The Volume Control pillar checks each Write/Edit operation:\n1. Is the target path under the user's Downloads folder (any drive)?\n2. Does the active project have a canonical workspace declared (a memory\n   file matching project_*_workspace.md OR a CANONICAL.txt elsewhere)?\n3. Does the file content classify as a strategic deliverable\n   (vertical-port phase deliverable, market analysis, voice/positioning\n   brief, product decisions doc, financial projection, board memo,\n   strategy doc) — heuristic check on filename + content\n4. If all three true → fire this rule\n"
+  },
+  "response": {
+    "action": "hard_pause",
+    "display": "red_box",
+    "message": "╔══════════════════════════════════════════════════════════════╗\n║ ⛔  CANONICAL WORKSPACE WRITE  ⛔                            ║\n╠══════════════════════════════════════════════════════════════╣\n║  Attempted write: {file_path}\n║  Detected as strategic deliverable.\n║\n║  Canonical workspace for this project:\n║    {canonical_path}\n║\n║  Strategic deliverables (Phase docs, market analyses, strategy\n║  memos, product decisions) belong in the canonical workspace,\n║  not Downloads. Downloads is for one-off artifacts you'll\n║  reference and move on; canonical is for project source-of-truth.\n║\n║  Options:\n║    [redirect] Write to canonical workspace instead\n║    [proceed] Write to Downloads anyway (one-off, will not be\n║              referenced as project source-of-truth)\n║    [cancel] Don't write\n║\n║  This is ADVISORY — severity `high` surfaces the box but does\n║  not block, so the write proceeds. Tell me to redirect and I\n║  will move it; say it is a genuine one-off and I will leave it.\n╚══════════════════════════════════════════════════════════════╝\n"
+  },
+  "failure_mode_prevented": {
+    "description": "Strategic deliverable lands in Downloads → operator references it from\nDownloads for a few days → relocate-or-discover-stale-copy decision\nforced later → if relocated, original Downloads copy becomes stale →\nif forgotten, downstream sessions may edit the Downloads copy thinking\nit's canonical.\n",
+    "cost": "Either rework cost (relocate then update all references) or silent\ndrift cost (downstream edits go to wrong copy, not visible in canonical\nworkspace, divergence builds across sessions).\n"
+  },
+  "heuristic_for_strategic_deliverable": {
+    "filename_patterns": [
+      "phase_-?\\d+_.*\\.md",
+      ".*_market_analysis\\.md",
+      ".*_pain_points\\.md",
+      ".*_product_decisions\\.md",
+      ".*_voice_positioning\\.md",
+      ".*_strategy(_memo)?\\.(md|pdf)",
+      ".*_competitive_analysis\\.md",
+      ".*_financial_projection\\.md",
+      ".*_board_(update|memo)\\.md"
+    ],
+    "content_signals": [
+      "YAML frontmatter with `type: project` or `type: deliverable`",
+      "File starts with markdown title matching strategic-deliverable patterns",
+      "References phase / decision-gate / product-matrix language"
+    ]
+  },
+  "allowlist": {
+    "description": "Some Downloads writes are correct and shouldn't be blocked. Allowlist:\n",
+    "patterns": [
+      ".*\\.zip$",
+      ".*\\.pdf$",
+      "screenshot.*\\.png$",
+      ".*_handoff_.*\\.md",
+      "allostat_handoffs/",
+      "session_\\d{8}/.*"
+    ]
+  },
+  "related_rules": [
+    "innate-03",
+    "innate-04"
+  ],
+  "implementation": {
+    "lib_module": "lib/folder_drift_check.py + new lib/canonical_workspace.py (TBD)",
+    "enforcer_hook": "PreToolUse (alongside cutoff_enforcer)"
+  },
+  "scope": "per-project (only fires when project has canonical workspace declared)"
+}

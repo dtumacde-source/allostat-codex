@@ -1,0 +1,45 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3.12 -I -B \"${CLAUDE_PLUGIN_ROOT}/bootstrap/local_entry.py\" run hook-session-start"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3.12 -I -B \"${CLAUDE_PLUGIN_ROOT}/bootstrap/local_entry.py\" run hook-stop"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3.12 -I -B \"${CLAUDE_PLUGIN_ROOT}/bootstrap/local_entry.py\" run hook-pre-tool-use"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3.12 -I -B \"${CLAUDE_PLUGIN_ROOT}/bootstrap/local_entry.py\" run hook-user-prompt-submit"
+          }
+        ]
+      }
+    ]
+  }
+}

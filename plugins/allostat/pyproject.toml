@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "allostat-mcp"
+version = "1.4.96"
+description = "Hosted-MCP wrapper for Allostat (Claude Code plugin)"
+authors = [{ name = "Dominick Tumacder" }]
+maintainers = [{ name = "Health Professions Data LLC", email = "support@allostat.ai" }]
+license = { text = "Proprietary" }
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-asyncio>=0.23"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["lib", "hooks"]
+markers = [
+    # R4 (2026-07-20). Tests whose PURPOSE is to attempt a non-loopback
+    # connection, to prove the in-process child guard refuses it. Their egress
+    # attempt is the assertion, not a defect.
+    #
+    # `contained_test_run.sh` deselects this marker so the kernel denial counter
+    # measures UNINTENDED egress only, and it says so on every run. The marker
+    # is pinned by `test_egress_allowance_is_pinned` -- adding it to a new test
+    # turns that test red, which is the point: an allowance nobody can enumerate
+    # is a waiver, and this file has already shipped four of those.
+    "attempts_egress: deliberately attempts egress to prove the guard refuses it",
+    "required_gate: a check whose purpose is to gate. Skipping one is converted to a FAILURE by tests/conftest.py -- a gate that skips when its subject is absent is not a gate.",
+    "real_platform_shell: intentionally executes the REAL platform shell (cmd / $SHELL) -- the install-time outside-in seam. Everything else gets a refusing runner from tests/conftest.py so no test can silently write a launcher module into the developer's real user site-packages.",
+    "codex_matrix: the standing outside-in Codex matrix (test_codex_matrix.py) -- real shells and real codex against tracked hostile paths; the definition of 'Codex support works'. Run the grid with `-m codex_matrix`. PRE-RELEASE GATE CANDIDATE: wiring it into the deploy pipeline is the operator's call (2026-08-05 launcher plan -- flagged, not gated).",
+]

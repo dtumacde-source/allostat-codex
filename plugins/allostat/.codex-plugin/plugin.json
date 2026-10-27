@@ -1,0 +1,60 @@
+{
+  "name": "allostat",
+  "version": "1.5.0+local.82d9149485e0",
+  "description": "Free-use proprietary local project memory. No Allostat account or hosted service.",
+  "author": {
+    "name": "Allostat",
+    "url": "https://allostat.ai"
+  },
+  "homepage": "https://allostat.ai",
+  "keywords": [
+    "memory",
+    "continuity",
+    "handoff",
+    "regulation",
+    "agent"
+  ],
+  "skills": "./skills/",
+  "mcpServers": {
+    "allostat": {
+      "command": "py",
+      "args": [
+        "-3.12",
+        "-I",
+        "-B",
+        "${CLAUDE_PLUGIN_ROOT}/bootstrap/local_entry.py",
+        "run",
+        "local-mcp"
+      ]
+    },
+    "allostat-memory-local": {
+      "command": "py",
+      "args": [
+        "-3.12",
+        "-I",
+        "-B",
+        "${CLAUDE_PLUGIN_ROOT}/bootstrap/local_entry.py",
+        "run",
+        "memory-mcp"
+      ]
+    }
+  },
+  "interface": {
+    "displayName": "Allostat",
+    "shortDescription": "Persistent memory and supported-session continuity for Codex.",
+    "longDescription": "Free-use proprietary local Allostat: durable project memory and supported-session continuity through an isolated stdio runtime. No Allostat account, activation or hosted service. Windows x64 and CPython 3.12 required; complete bundled local-setup after marketplace installation. Existing memory and owner preferences are retained.",
+    "developerName": "Allostat",
+    "category": "Productivity",
+    "capabilities": [],
+    "websiteURL": "https://allostat.ai",
+    "defaultPrompt": [
+      "Pick up where my last session left off.",
+      "What do you remember about this project?"
+    ]
+  },
+  "extensions": {
+    "com.openai": {
+      "onboardingSkill": "./skills/local-setup/SKILL.md"
+    }
+  }
+}

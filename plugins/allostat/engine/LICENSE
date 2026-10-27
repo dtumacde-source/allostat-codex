@@ -1,0 +1,89 @@
+Allostat Local Edition Free-Use Proprietary License
+Version 1.0
+
+Copyright (c) 2026 Health Professions Data LLC. All rights reserved except
+as expressly granted below or under applicable third-party licenses.
+
+1. Covered software
+
+These terms cover the Allostat local-edition components distributed with this
+license by Health Professions Data LLC (the Owner). Allostat remains proprietary;
+this is not an open-source license. These terms do not relicense earlier releases
+or third-party material.
+
+2. Free local use
+
+The Owner grants you a worldwide, nonexclusive, royalty-free right to download
+the covered software from an official distribution channel, inspect, install,
+and use it for personal and commercial activities. An organization may install
+it on devices it controls for its internal activities. You may make private
+working and backup copies for these permitted uses.
+
+No Allostat subscription, account, activation code, or connection to an Allostat
+service is required. Your AI provider and host application remain separate
+products, subject to their own costs and terms.
+
+3. Private modifications
+
+You may modify private copies for your own permitted use. Preserve copyright
+and license notices and do not represent modified copies as official releases.
+This does not authorize distributing modified copies or offering Allostat itself
+as a service to others.
+
+4. Distribution reserved to the Owner
+
+The Owner is the sole distributor of the covered proprietary Allostat software.
+Official repositories, marketplaces, and hosting providers may deliver copies
+on the Owner's behalf. Linking to official distribution channels is encouraged.
+
+Without separate written permission from the Owner, you may not redistribute,
+mirror, publish, sublicense, sell, rent, or repackage the covered software or
+modified versions, or offer its functionality as a hosted or managed Allostat
+service. Using Allostat internally to produce your own work, including paid
+client work, is permitted; this license does not restrict distribution of that
+work. These restrictions do not limit rights granted by applicable law or the
+independent rights in section 5. Contact: support@allostat.ai.
+
+5. Third-party and previously licensed material
+
+Third-party components remain governed by their own licenses. Their required
+notices and materials must be preserved. If these terms conflict with a
+third-party license, that license controls for that component. See the bundled
+THIRD_PARTY_NOTICES directory and its inventory for exact components and
+original notices. The restrictions above do not apply to independent rights in
+those components. These terms do not revoke rights previously granted under
+another license. A new repository history does not change previously granted
+rights.
+
+6. Your memory and content
+
+These terms transfer no ownership of your project files, memory records, prompts,
+or outputs to the Owner. You retain whatever rights you otherwise have in them
+and may export, retain, change, or delete them independently of Allostat. Local
+software may supply retrieved content to your chosen AI host; the host's
+processing is governed by its own terms and settings.
+
+7. Future products and fees
+
+The Owner may offer optional paid services, separately licensed future releases,
+or additional commercial features. No retroactive fee or subscription condition
+applies to a version validly obtained under this free-use license. Its grant
+continues while you comply with these terms. Updates, support, continued download
+availability, and optional services are not promised.
+
+8. Breach and termination
+
+The Owner may terminate this grant for a material breach remaining uncured
+30 days after written notice. Termination affects rights to the covered software,
+not ownership of your content or independent third-party rights. Nothing here
+authorizes remote deletion of memory, files, or settings.
+
+9. Warranty and liability
+
+To the extent permitted by applicable law, the software is provided AS IS,
+without warranties of merchantability, fitness for a particular purpose, or
+noninfringement. Memory and safety features are best-effort and do not replace
+your judgment, testing, backups, or security controls. To the extent permitted
+by applicable law, the Owner is not liable for damages arising from use of the
+software. Nothing excludes rights or liability that applicable law does not
+allow to be excluded.

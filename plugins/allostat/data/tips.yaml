@@ -1,0 +1,1496 @@
+version: 2
+schema: curated-2026-05-15
+last_updated: '2026-05-15'
+curated_by: advisor
+supersedes: legacy v1 tips file (270 tips, ~235 of which were auto-generated filler with operator-specific pollution)
+curation_notes:
+- Cut all single-variant auto-generated filler from the v2 merge.
+- Cut all operator-specific references (operator prose, brand palette, drive letters, project names, vertical-specific content, marketing channels).
+- Each tip carries 3 materially-different variants (not three rephrasings of the same idea).
+- Persona tagging used only for skill-activation triggers; session-start tips default to `general` until v2.5 persona-routing logic ships in the wrapper.
+- Voice is terse imperative — no hedge words ("consider", "you might want to", "perhaps"), no AI-slop ("leverage", "robust", "comprehensive", "seamless").
+schema_fields_locked_2026_05_08:
+- persona (general + 10 task_class personas)
+- category (discovery | lifecycle | workflow | skill-support)
+- axis (task_class | user_identity)
+- fires_when (session_start | skill_activation:<skill-name> | both)
+- skill_target (when category == skill-support)
+- conflicts_with (list of nudge ids; default [])
+schema_fields_preserved_from_v1:
+- id, class, weight (1-5), cooldown_days, context_conditions, variants
+total_tips: 78
+tips:
+
+# ============================================================
+# GENERAL — always-eligible — Memory hygiene
+# ============================================================
+
+- id: sort-memory-001
+  class: always-eligible
+  weight: 5
+  cooldown_days: 7
+  context_conditions: null
+  variants:
+  - 'Type #sort-memory to audit your memory tree. Allostat scans for overlap, proposes merges, slims MEMORY.md to navigation only.'
+  - 'Memory tree drifting? #sort-memory consolidates overlapping rules and updates cross-references in one pass.'
+  - '#sort-memory is the hygiene shortcut. Catches feedback-file accumulation before it bloats your context budget.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: merge-memory-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 7
+  context_conditions: null
+  variants:
+  - '#merge-memory scans feedback files for conceptual overlap above 50%. Approve in batch; consolidate without manual review.'
+  - 'MEMORY.md past 100 lines? Run #merge-memory. Proposes merges with diffs so you can collapse redundancy cleanly.'
+  - 'Use #merge-memory to find rule duplication. You approve, Allostat consolidates. Inverse of just-deleting.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: audit-memory-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '#audit-memory runs sort + merge + a 90-day staleness check in one pass. Monthly hygiene.'
+  - 'Want a full sweep? #audit-memory flags rules unreferenced for 90+ days alongside standard sort and merge.'
+  - 'Comprehensive audit in one command. #audit-memory pulls sort, merge, and staleness into a single pass.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+# ============================================================
+# GENERAL — always-eligible — Slash commands (discovery)
+# ============================================================
+
+- id: cmd-status-001
+  class: always-eligible
+  weight: 5
+  cooldown_days: 7
+  context_conditions: null
+  variants:
+  - 'Run /allostat status for current load, adaptivity, rule counts, and pending items in one shot.'
+  - '/allostat status surfaces project vitals in-terminal. Fastest at-a-glance check.'
+  - 'Type /allostat status for load + adaptivity + rule tiers + last calibration in a single output.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-status-all-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Run /allostat status --all for the archipelago view: every project at once.'
+  - '/allostat status --all renders all projects in one banner. Cross-organism scan.'
+  - 'Use /allostat status --all to spot which projects need attention. Side-by-side.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-tend-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/allostat tend runs hygiene on the current project: archives aging files, validates markers, sweeps purge candidates.'
+  - 'Run /allostat tend monthly to keep filesystem clean before the global purge sweep fires.'
+  - 'Per-project hygiene. /allostat tend handles archiving, marker validation, drift detection in one command.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-fork-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - '/allostat fork lists architectural decisions you flagged but haven''t committed to a path.'
+  - 'Unresolved decisions piling up? /allostat fork surfaces every fork-point waiting on a commit.'
+  - '/allostat fork is your unresolved-decision inventory. Close them or defer explicitly.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-init-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 30
+  context_conditions: null
+  variants:
+  - '/allostat init <project-name> spins up a fresh Allostat project. Onboarding runs once.'
+  - 'Recurring topic? Promote it to a dedicated project with /allostat init. ~5-minute setup.'
+  - 'Use /allostat init when a generic topic earns its own load tracking and memory tier.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-loadhandoff-001
+  class: always-eligible
+  weight: 5
+  cooldown_days: 7
+  context_conditions: null
+  variants:
+  - 'Run /loadhandoff at session start to read the latest handoff into context. Pick up without re-explaining.'
+  - '/loadhandoff loads your most recent session-end handoff. Use when continuing from a checkpoint.'
+  - 'Type /loadhandoff to bootstrap context. Allostat reads the handoff, surfaces open decisions and threads.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-calibrate-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - '/allostat calibrate refreshes imprinted preferences. Recommended every 90 days.'
+  - 'Run /allostat calibrate --voice to update only voice samples without redoing the full interview.'
+  - 'Use /allostat calibrate --partial <topics> when only specific domains have drifted.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-train-001
+  class: always-eligible
+  weight: 2
+  cooldown_days: 30
+  context_conditions: null
+  variants:
+  - '/allostat train opens meta-work mode. Tune Allostat itself: calibration, learned-rule review, avatar.'
+  - 'Run /allostat train when you want to refine the system, not your project. Sub-menu covers rules, voice, sensitivity.'
+  - 'Use /allostat train to work on Allostat as the project. Different from init (new project) and calibrate (refresh).'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-audit-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - '/allostat audit runs sensitivity audit on your rule library. Flags drift and stale rules.'
+  - 'Run /allostat audit quarterly. Catches rule contradictions and bit-rotted patterns.'
+  - 'Use /allostat audit when your rules and your observed behavior have drifted apart.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-why-fired-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/allostat why-fired shows which nudges fired this session and why. Inspect the regulator.'
+  - 'Confused by a recommendation? /allostat why-fired explains the trigger chain.'
+  - 'Run /allostat why-fired after surprising behavior. Discoverability surface for the nudge layer.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-recall-full-001
+  class: always-eligible
+  weight: 2
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - '/allostat recall-full surfaces full prior-case context for this turn instead of one-line summaries.'
+  - 'Use /allostat recall-full when topic-match recall feels too compressed. Trades token cost for depth.'
+  - '/allostat recall-full is the deep-dive on prior cases. Default is compressed; this is verbose.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-clear-load-001
+  class: always-eligible
+  weight: 2
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/allostat clear-load dismisses currently-triggered load signals as phantom. Auto-rearms on new events.'
+  - 'Load nudges firing on stale state? Run /allostat clear-load to acknowledge and rearm.'
+  - 'Use /allostat clear-load when chronic-load signals fire from old residue, not current state.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-handoff-now-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/allostat handoff-now writes a handoff doc immediately instead of waiting for session-end.'
+  - 'About to pivot to unrelated work? /allostat handoff-now flushes current state to disk first.'
+  - 'Use /allostat handoff-now mid-session to lock a checkpoint before context shifts.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-skills-001
+  class: always-eligible
+  weight: 2
+  cooldown_days: 30
+  context_conditions: null
+  variants:
+  - '/allostat skills manages your skill-favorites filter. Promote what you use; demote what you don''t.'
+  - 'Run /allostat skills to see usage stats on installed skills. Recommendation-only by default.'
+  - 'Use /allostat skills to clean up the skill catalog. Apply changes explicitly to persist.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: cmd-update-001
+  class: always-eligible
+  weight: 1
+  cooldown_days: 60
+  context_conditions: null
+  variants:
+  - '/allostat update migrates an active project''s .allostat/ state to the latest schema. Idempotent.'
+  - 'After a plugin version bump, run /allostat update to migrate state files.'
+  - 'Use /allostat update when prompted by the loader. Schema migrations are versioned; old projects keep working.'
+  persona: general
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+# ============================================================
+# GENERAL — always-eligible — Concepts
+# ============================================================
+
+- id: concept-allostatic-load-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Allostatic load measures chronic regulatory stress on a project. Only deadline-bearing or compounding-cost items contribute; 200 inert todos count as zero.'
+  - 'The load meter reflects active stress, not total work. Project-isolated; commit-bearing items raise it; reading code doesn''t.'
+  - 'Allostatic load is item-filtered, not work-volume. Most todos are inert until acted on.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: concept-adaptivity-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Adaptivity measures how well-fitted Allostat is to you. Combines rule depth, refinement events, voice fidelity, pattern detection, override rate.'
+  - 'The adaptivity meter tracks Allostat-to-operator fit, not productivity. Rich rules + low override rate reads HIGH.'
+  - 'Adaptivity is the system''s tuning index. Even cold-open sessions show non-zero adaptivity from imprinted user-tier rules.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: concept-rule-tiers-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Rules layer in five tiers: innate (10 ship-with), user (cross-project), umbrella (linked-project), project (single), session (transient).'
+  - 'Rule precedence: lower tiers override higher only via explicit logged exceptions. Innate ships with the plugin; learned rules accumulate.'
+  - 'The five tiers form the inheritance hierarchy. User-tier voice samples and preferences carry across all projects.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: concept-archipelago-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - 'Each Allostat project is its own organism. Load is project-isolated; user-tier rules apply across all islands.'
+  - 'Allostat''s archipelago topology: linked projects share imprinted preferences, evolve learned rules independently, never aggregate load.'
+  - 'Projects are separate organisms in one archipelago. Cross-project file access fires welcome banners but doesn''t merge load math.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: concept-voice-keeper-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - 'Voice-keeper protects your prose voice. When Allostat produces text, it evaluates output against your reference and flags drift.'
+  - 'Allostat''s voice-keeper applies your samples to any text deliverable. Iterates writer-to-keeper until output matches.'
+  - 'When Allostat writes copy, voice-keeper checks it against your reference file. Catches drift before it ships.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: concept-pattern-observer-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - 'Pattern Observer captures behavior across sessions. Four sustained occurrences without contradiction triggers a learned-rule proposal.'
+  - 'Allostat''s learning loop fires at N=4 cross-session (N=2 in-session). Pattern Observer surfaces a proposal; you approve, the rule enters with amplified retrieval.'
+  - 'Pattern Observer is the positive feedback loop. Detects repeated behavior, proposes formalization, normalizes after approval.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: concept-handoff-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Handoff cadence: write one at session-end on every load-bearing session. Skipping == lossy continuity.'
+  - 'Session-end handoffs capture state — decisions, open threads, next steps. /loadhandoff reads them back on the next session.'
+  - 'Handoffs are the bridge between sessions. Allostat auto-generates one at 50k/150k/300k/500k volume thresholds.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: concept-stress-response-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - 'Stress-response watches for repeated tool failures, contradictions, drift, and chronic patterns. Fires nudges when thresholds cross.'
+  - 'Allostat''s stress-response cascade is staged: fast for acute (red-box), slow for chronic (gradual surface).'
+  - 'When something feels off mid-session, /allostat why-fired reveals which stress-response triggered.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+# ============================================================
+# GENERAL — always-eligible — Workflow patterns
+# ============================================================
+
+- id: workflow-sandbox-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Sandbox folder convention: <project>_sandbox/ for draft variants and exploration. Keep working drafts out of canon.'
+  - 'Use a sandbox subfolder for variants you don''t want in canon yet. README.md frames permissions and scope.'
+  - 'Sandbox folders quarantine experimental work. Canon files stay clean; explorations land alongside dated.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: workflow-legacy-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - '_LEGACY suffix on every rollout — archive the superseded version IN THE SAME TURN, not "later".'
+  - 'When you replace a file, rename the old to *_LEGACY_pre_<event>_<date>.<ext>. Same turn, no deferral.'
+  - 'LEGACY archival is mid-rollout discipline. The 30-day clock starts when the suffix lands.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: workflow-purge-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - 'PURGE lifecycle: LEGACY files → _PURGE/YYYYMMDD/ at 30 days → safe wholesale-delete at 60 days.'
+  - 'Two-stage archive. _LEGACY for 30 days, _PURGE for 30 more, then disposal. Reversible the whole way.'
+  - 'The purge sweep is monthly. /allostat tend triggers a per-project pass; ''run the purge sweep'' triggers the global.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: workflow-three-pass-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - 'Three-pass design workflow: Brainstorm → Plan → Execute. Skipping passes 1-2 leads to 15+ revision cycles.'
+  - 'Brainstorm before planning. Plan before executing. The two front passes are short; skipping them stretches the third.'
+  - 'For non-trivial work, separate the three passes explicitly. Each pass has a different skill loaded.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: workflow-canonical-001
+  class: always-eligible
+  weight: 2
+  cooldown_days: 30
+  context_conditions: null
+  variants:
+  - 'CANONICAL.txt marker drops in the active edit folder when two folders look canonical. Easy disambiguation.'
+  - 'Mark canon explicitly when you''ve got dev-tree, runtime-cache, and marketplace copies. CANONICAL.txt is the tiebreaker.'
+  - 'Multi-copy divergence breaks edits silently. CANONICAL.txt + sync-to-runtime is the standard pattern.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: workflow-memory-architecture-001
+  class: always-eligible
+  weight: 2
+  cooldown_days: 30
+  context_conditions: null
+  variants:
+  - 'Memory tree asymmetry: cwd determines which memory loads, not the project name. Follow MEMORY.md pointers.'
+  - 'If the cwd doesn''t match the project you''re working in, the wrong memory loads. associated_directories.md is the canonical map.'
+  - 'Memory loads from ~/.claude/projects/<sanitized-cwd>/memory/. Routing across projects is your job, not the harness''s.'
+  persona: general
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+# ============================================================
+# GENERAL — context-triggered
+# ============================================================
+
+- id: ctx-cold-open-001
+  class: context-triggered
+  weight: 5
+  cooldown_days: 14
+  context_conditions:
+    project_context: generic
+  variants:
+  - 'Working without a project? Recurring topics earn their own. Run /allostat init <project-name> for isolated load tracking.'
+  - 'Generic context is fine for one-offs. When something becomes recurring work, /allostat init gives it a dedicated home.'
+  - 'One command — /allostat init <project-name> — and your recurring topic gets a dedicated memory tier.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: ctx-load-elevated-001
+  class: context-triggered
+  weight: 5
+  cooldown_days: 1
+  context_conditions:
+    allostatic_load_min: 0.33
+  variants:
+  - 'Allostatic load is elevated. Quick wins: #sort-memory, #merge-memory, archive stale handoffs, mark dormant projects.'
+  - 'Load reading at MODERATE+. Easiest reductions: /allostat tend, then audit pending items for parked-vs-active classification.'
+  - 'Stress signal tripped. /allostat tend clears filesystem clutter; chronic load reduces with rest, not work.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: ctx-calibration-overdue-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 7
+  context_conditions:
+    calibration_age_days_min: 90
+  variants:
+  - 'Last calibration over 90 days ago. Run /allostat calibrate --partial to refresh drifted topics, or --voice for prose samples only.'
+  - 'Calibration drift detected. /allostat calibrate refreshes imprinted preferences; targeted variants exist for voice and partial domains.'
+  - 'Imprinting may have drifted from observed behavior. /allostat calibrate --partial <topics> refreshes only the affected domains.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: ctx-stale-rules-001
+  class: context-triggered
+  weight: 3
+  cooldown_days: 7
+  context_conditions:
+    stale_rule_count_min: 5
+  variants:
+  - 'Five or more rules unreferenced in 90+ days. Run /allostat audit or #merge-memory to consolidate or archive.'
+  - 'Stale-rule overhead detected. Old rules without recent firing can be archived (move to archive/) or merged into active ones.'
+  - 'Rules accumulating without use weigh on adaptivity. /allostat audit flags candidates; #merge-memory proposes consolidations.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: ctx-purge-overdue-001
+  class: context-triggered
+  weight: 3
+  cooldown_days: 7
+  context_conditions:
+    legacy_files_30d_min: 5
+  variants:
+  - 'LEGACY files older than 30 days are eligible for purge. Say "run the purge sweep" to trigger.'
+  - 'Filesystem clutter detected. /allostat tend handles per-project; the purge sweep is global.'
+  - 'Purge overdue. *_LEGACY_pre_*_rollout files past 30 days can move to _PURGE/ for the 60-day delete window.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: ctx-adaptivity-low-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 14
+  context_conditions:
+    adaptivity_max: 0.3
+  variants:
+  - 'Adaptivity is LOW. /allostat init may help if this is a new project; /allostat calibrate refreshes imprinting at 90+ days.'
+  - 'System fit reads DEVELOPING. /allostat calibrate to capture more behavioral preferences, or /allostat init for onboarding.'
+  - 'Adaptivity below threshold. Pattern Observer hasn''t fired (0 learned rules); /allostat train adjusts pattern-detection sensitivity.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: ctx-handoff-fresh-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 1
+  context_conditions:
+    recent_handoff_age_hours_max: 48
+  variants:
+  - 'Your recent handoff (<48h old) auto-loads into context at session start now — continuity just happens, no command needed.'
+  - 'Recent handoff detected; it was injected automatically at session start. /loadhandoff still re-loads it on demand.'
+  - 'Fresh handoff on disk — auto-loaded this session. Use /recall to search older handoffs.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: ctx-drift-detected-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 7
+  context_conditions:
+    drift_topics_min: 3
+  variants:
+  - 'Drift detected across 3+ topics. Run /allostat calibrate to re-imprint or /allostat audit to see which rules are stale.'
+  - 'Pattern-observer flagged drift recurrence. /allostat why-fired shows the triggers; /allostat calibrate refreshes preferences.'
+  - 'Multiple corrections this session suggest preferences shifted. /allostat calibrate --partial <topics> rebases the affected ones.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+# ============================================================
+# GENERAL — session-end-signal
+# ============================================================
+
+- id: session-end-signal-001
+  class: session-end-signal
+  weight: 5
+  cooldown_days: 1
+  context_conditions:
+    session_token_count_min: 50000
+  variants:
+  - 'Done? Type "close session" so Allostat can run cleanup. #sort-memory, #merge-memory, sweep, and handoff fire automatically.'
+  - 'Signal session-end with "close session" or "close". Triggers the auto-cleanup sequence before context fills.'
+  - 'Closing without a signal skips cleanup. "close session" fires #sort-memory, #merge-memory, and the handoff write.'
+  persona: general
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+# ============================================================
+# CODER persona
+# ============================================================
+
+- id: coder-tdd-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - '/superpowers:test-driven-development before any feature or bugfix. Failing test first, watch it fail, then implement.'
+  - 'TDD discipline: write the failing test before any implementation code. Don''t skip the watch-it-fail step.'
+  - 'Test-driven workflow surfaces design problems early. The failing test is your spec.'
+  persona: coder
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: test-driven-development
+
+- id: coder-debugging-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - '/superpowers:systematic-debugging when bugs surface. Reproduce with a minimal failing test before proposing fixes.'
+  - 'Structured debugging methodology beats guess-and-patch. Confirms understanding before code changes.'
+  - 'Hit a bug? Reproduce minimally first. The reproduction IS the regression test.'
+  persona: coder
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: systematic-debugging
+
+- id: coder-planning-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/superpowers:writing-plans before any non-trivial multi-step task. Plans should name files + line numbers.'
+  - 'Vague plans become drifting implementations. Specific plans land as code with fewer revisions.'
+  - 'Plan with file paths and line numbers. Generic plans waste the planning phase.'
+  persona: coder
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: writing-plans
+
+- id: coder-parallel-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/superpowers:dispatching-parallel-agents when 2+ independent tasks have no shared state. Sequential dependencies → sequential.'
+  - 'Parallel subagents save context budget on broad searches. One main thread for synthesis; subagents for breadth.'
+  - 'Subagent dispatch for context-heavy research. Decision and synthesis stay on the main thread.'
+  persona: coder
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: dispatching-parallel-agents
+
+- id: coder-worktrees-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/superpowers:using-git-worktrees for isolated feature work. Avoids polluting the current workspace.'
+  - 'Worktrees are cheap branches with isolated working directories. Useful for hypothesis-testing without merge churn.'
+  - 'Use a worktree when feature work might be discarded. Costs nothing to clean up.'
+  persona: coder
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: using-git-worktrees
+
+- id: coder-review-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/superpowers:requesting-code-review before merging. Verifies feature correctness, not just type shape.'
+  - 'Code review verifies the feature works end-to-end. Type checks verify the code compiles. Both matter.'
+  - 'Ship feature tests alongside unit tests. Reviewers verify the user-facing behavior.'
+  persona: coder
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: requesting-code-review
+
+- id: coder-tdd-activated-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'TDD just fired — failing test first, watch it fail, implement minimum, watch it pass.'
+  - 'TDD checklist: red → green → refactor. The watch-it-fail step is non-skippable.'
+  - 'Write the test, run it, see it fail. THEN implement. The fail proves the test is wired.'
+  persona: coder
+  category: skill-support
+  axis: task_class
+  fires_when: skill_activation:test-driven-development
+  conflicts_with: []
+  skill_target: test-driven-development
+
+- id: coder-debug-activated-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Debugging skill fired — reproduce the bug with a minimal failing test BEFORE proposing fixes.'
+  - 'Systematic debugging: state the bug, reproduce minimally, hypothesize, test the hypothesis. Order matters.'
+  - 'Don''t patch before reproducing. The reproduction is what proves the fix later.'
+  persona: coder
+  category: skill-support
+  axis: task_class
+  fires_when: skill_activation:systematic-debugging
+  conflicts_with: []
+  skill_target: systematic-debugging
+
+# ============================================================
+# WRITER persona
+# ============================================================
+
+- id: writer-voice-keeper-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Voice-keeper applies + evaluates your prose voice on text deliverables. Run before publishing.'
+  - 'Your *_prose.md or *_voice.md reference is the voice authority. Allostat reads it on every text deliverable.'
+  - 'Drafting copy? Voice-keeper iterates writer-to-keeper until output matches your reference.'
+  persona: writer
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: voice-keeper
+
+- id: writer-calibrate-voice-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - '/allostat calibrate --voice — voice-only re-calibration when copy starts feeling off.'
+  - 'Re-calibrate voice quarterly. Style evolves; capture fresh samples to keep imprint current.'
+  - 'If your latest writing reads different from a year ago, --voice updates only the prose reference without redoing the full interview.'
+  persona: writer
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: writer-frontend-design-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'frontend-design applies to PDFs too. Invoke before any printed deliverable (newsletters, lead magnets, reports).'
+  - 'Polished PDFs need typography work: weight contrast over decorative fonts. frontend-design handles the system.'
+  - 'Newsletter, lead magnet, board memo? frontend-design first, then content. Aesthetic lock prevents revision churn.'
+  persona: writer
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: frontend-design
+
+- id: writer-brainstorm-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/superpowers:brainstorming before any new creative piece. Explores intent before drafting.'
+  - 'Brainstorm phase prevents wrong-direction drafts. 10 minutes of structure saves 2 hours of revision.'
+  - 'When the assignment is broad, brainstorm first. Plans need direction; drafts need a plan.'
+  persona: writer
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: brainstorming
+
+- id: writer-voice-activated-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Voice-keeper fired — check active reference file (*_prose.md). Verify register and cadence match.'
+  - 'Voice check active. If output reads AI-flavored, re-evaluate against reference; don''t accept the first revision blindly.'
+  - 'Voice violation triggers re-fire. Confirm the revision matches, not just that it''s different.'
+  persona: writer
+  category: skill-support
+  axis: task_class
+  fires_when: skill_activation:voice-keeper
+  conflicts_with: []
+  skill_target: voice-keeper
+
+- id: writer-frontend-design-activated-001
+  class: context-triggered
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'frontend-design fired — lock aesthetic direction first. Premium-utility or clinical, NOT brutalist/editorial by default.'
+  - 'Building a PDF? Inter or system sans body; JetBrains Mono or IBM Plex Mono for tabular data. Weight contrast over decorative fonts.'
+  - 'Layout rule: no orphan titles, ≤20% bottom whitespace, relevant graphics only. Apply before review.'
+  persona: writer
+  category: skill-support
+  axis: task_class
+  fires_when: skill_activation:frontend-design
+  conflicts_with: []
+  skill_target: frontend-design
+
+# ============================================================
+# WEBDEV persona
+# ============================================================
+
+- id: webdev-frontend-design-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'frontend-design loads before any visual or layout deliverable. Non-negotiable for production work.'
+  - 'UI work without frontend-design tends to produce generic AI aesthetics. Load the skill first.'
+  - 'Components, pages, applications — frontend-design first. Lock direction before code.'
+  persona: webdev
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: frontend-design
+
+- id: webdev-init-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - '/init initializes a CLAUDE.md for codebase docs. Lock conventions early.'
+  - 'New project? /init drops a CLAUDE.md scaffold. Document constraints before they''re forgotten.'
+  - 'CLAUDE.md is the project''s authority file. Initialize early; reference often.'
+  persona: webdev
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: init
+
+- id: webdev-test-browser-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Test in the browser before claiming UI work is done. Type checks ≠ feature correctness.'
+  - 'For frontend changes, start the dev server and use the feature in a real browser. Type checks miss visual regressions.'
+  - 'Manual browser verification is non-skippable for UI. Tests verify code; eyes verify the feature.'
+  persona: webdev
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: webdev-frontend-activated-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'frontend-design fired — lock aesthetic direction first. Premium-utility/clinical, NOT brutalist/editorial.'
+  - 'Inter or system sans body. JetBrains Mono for data. No decorative serifs unless explicitly requested.'
+  - 'Headings: weight + size variation, NOT display-font swaps. Polish from typography hierarchy.'
+  persona: webdev
+  category: skill-support
+  axis: task_class
+  fires_when: skill_activation:frontend-design
+  conflicts_with: []
+  skill_target: frontend-design
+
+# ============================================================
+# DATA persona
+# ============================================================
+
+- id: data-xlsx-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - '/anthropic-skills:xlsx for any spreadsheet operation. Reads, edits, charts, formula generation.'
+  - 'Spreadsheet work without the xlsx skill ends in manual hand-editing. Load the skill first.'
+  - 'xlsx handles .xlsx, .xlsm, .csv, .tsv. Use for clean restructuring of messy tabular data.'
+  persona: data
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: xlsx
+
+- id: data-pdf-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - '/anthropic-skills:pdf for read/extraction/OCR on data-heavy PDFs. Tables especially.'
+  - 'PDF tables resist simple extraction. The pdf skill handles structure; manual parsing fails on multi-column.'
+  - 'Need to extract from PDFs? Load pdf skill before any extraction loop.'
+  persona: data
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: pdf
+
+- id: data-verify-source-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'WebFetch + Grep for source verification. Verify before citing; trust nothing inherited.'
+  - 'When citing a stat, fetch the source page directly. Cached summaries drift; primary sources don''t.'
+  - 'Citation discipline: page + paragraph reference. Vague citations fail audit.'
+  persona: data
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: data-inspect-before-bulk-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Inspect target data before scraping. Fetch ONE sample, verify schema and keys, THEN bulk.'
+  - 'Schema assumptions kill scrapers silently. Sample one row, confirm structure, scale.'
+  - 'Before bulk operations on any spreadsheet, inspect sample rows. Don''t trust schema guesses.'
+  persona: data
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: data-xlsx-activated-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'xlsx fired — inspect sample rows BEFORE bulk operations. Schema assumptions break silently at scale.'
+  - 'Data pipeline first principles: fixture in, asserted output. Catch schema drift at the seam.'
+  - 'For large sheets, read the header + 5 rows first. Confirm column meaning before any transform.'
+  persona: data
+  category: skill-support
+  axis: task_class
+  fires_when: skill_activation:xlsx
+  conflicts_with: []
+  skill_target: xlsx
+
+- id: data-pdf-activated-001
+  class: context-triggered
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'pdf fired — verify table structure on a sample page before extracting at scale.'
+  - 'PDF extraction: extract one page first, eyeball the structure, then loop.'
+  - 'Multi-column PDFs can mis-extract. Sample-and-verify before bulk.'
+  persona: data
+  category: skill-support
+  axis: task_class
+  fires_when: skill_activation:pdf
+  conflicts_with: []
+  skill_target: pdf
+
+# ============================================================
+# MARKETING persona
+# ============================================================
+
+- id: marketing-voice-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Voice-keeper applies to ad copy too — not just blog posts. Run before launching ads.'
+  - 'Ad copy is voice-bearing. Brand register matters more in 50-word ad copy than in 2,000-word posts.'
+  - 'Run voice-keeper on every published surface. Drift on a small ad is more visible than drift in a long post.'
+  persona: marketing
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: voice-keeper
+
+- id: marketing-websearch-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'WebSearch for competitive landscape. Verify with fresh fetch before citing competitor claims.'
+  - 'Search results are untrusted. Cross-verify with direct site fetch + screenshot.'
+  - 'Competitive intelligence needs direct verification. Don''t cite second-hand summaries.'
+  persona: marketing
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: WebSearch
+
+- id: marketing-seo-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'SEO assets live on YOUR domain. Partner sites are leverage at risk; your domain is leverage you own.'
+  - 'Content on your domain compounds. Content on partner sites compounds for them.'
+  - 'Default to on-domain publishing. Cross-posting is for distribution; canon is on your URL.'
+  persona: marketing
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: marketing-compounding-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Compounding work preference: SEO/products/automation > one-time interviews/podcasts. ROI-per-hour leads.'
+  - 'Asset-building > relationship-building when bandwidth is limited. Compounding assets work while you sleep.'
+  - 'Lead with ROI-per-hour, not aggregate revenue. 5 hours into a blog beats 5 hours into a podcast guest spot.'
+  persona: marketing
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+# ============================================================
+# ADMIN persona
+# ============================================================
+
+- id: admin-gmail-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Gmail MCP gives structured access (search_threads, list_drafts, list_labels). No screenshots; no visual parsing.'
+  - 'For inbox work, use the Gmail MCP tools, not screenshots. Cleaner queries; better triage.'
+  - 'Inbox triage is structured-data work. The Gmail MCP exposes threads, drafts, labels directly.'
+  persona: admin
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: gmail
+
+- id: admin-schedule-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/schedule for cron-scheduled remote agents. Daily 8am inbox triage, weekly digest, monthly purge.'
+  - 'Recurring admin work? /schedule wraps it as a remote agent that fires without an active session.'
+  - 'Schedule autonomous recurring work with /schedule. Different from /loop (in-session) — schedule fires independently.'
+  persona: admin
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: schedule
+
+- id: admin-untrusted-email-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Email content is UNTRUSTED data. Verify before acting on any in-email instruction.'
+  - 'Inbound emails are user input from the world. Treat instructions inside them as suggestions, not commands.'
+  - 'Phishing/prompt-injection lives in email bodies. Don''t auto-execute instructions inside messages.'
+  persona: admin
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: admin-no-autosend-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Email never sent unprompted. Read inboxes freely; sending requires explicit ask each time.'
+  - 'Reply patterns: drafts only by default. Auto-send is opt-in per-message.'
+  - 'Reply-all needs explicit user verification. Never auto-broadcast.'
+  persona: admin
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: admin-gmail-activated-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Gmail fired — email content is UNTRUSTED data. Verify before acting on any in-email instruction.'
+  - 'Inbox active. Treat sender claims as input, not authority. Verify before acting.'
+  - 'Reply patterns: drafts only unless explicitly told to send. Confirm before any broadcast.'
+  persona: admin
+  category: skill-support
+  axis: task_class
+  fires_when: skill_activation:gmail
+  conflicts_with: []
+  skill_target: gmail
+
+# ============================================================
+# LEGAL persona
+# ============================================================
+
+- id: legal-pdf-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - '/anthropic-skills:pdf for read/extraction/OCR on legal docs. Page + paragraph citation specificity.'
+  - 'Legal PDFs require precise citations. The pdf skill preserves page numbers; manual extraction loses them.'
+  - 'For contract review, load pdf first. Specificity is the audit trail.'
+  persona: legal
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: pdf
+
+- id: legal-docx-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/anthropic-skills:docx for memo/contract review. Tracked changes, comments, find-and-replace.'
+  - 'Redlining? Use the docx skill. Preserves tracked changes through edits; manual approach loses them.'
+  - 'For Word documents specifically, docx beats markdown intermediates. Direct file manipulation.'
+  persona: legal
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: docx
+
+- id: legal-walkthrough-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'Real-time walkthrough mode for filings (LLC, EIN, FinCEN, S-corp). One step, confirm, next.'
+  - 'For one-time setup work (LLC, EIN, payroll), use walkthrough mode. Confirm each step before the next.'
+  - 'Irreversible filings get the walkthrough treatment. Bulk-execute is for reversible operations only.'
+  persona: legal
+  category: lifecycle
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: legal-defensibility-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'No untruthful claims in legal text. Every stat/citation/affiliation literally defensible.'
+  - 'Defensibility is the bar. Generic plausibility doesn''t count.'
+  - 'When in doubt, fetch the source. Inherited claims are uninherited liability.'
+  persona: legal
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: legal-pii-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'PII discipline: no SSNs, account numbers, ID numbers fed into Claude. Operator enters those directly.'
+  - 'Never compile lists of personal data from multiple sources. Aggregation is its own exposure surface.'
+  - 'For forms requiring SSN/account/ID, walkthrough mode. Operator types in the field; the model doesn''t see it.'
+  persona: legal
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+- id: legal-pdf-activated-001
+  class: context-triggered
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'pdf fired on legal doc — extract page + paragraph for every citation. Specificity = audit trail.'
+  - 'Legal extraction: cite by page number AND paragraph. Vague citations fail review.'
+  - 'For each pulled fact, anchor to the page. Make the reviewer''s verification trivial.'
+  persona: legal
+  category: skill-support
+  axis: task_class
+  fires_when: skill_activation:pdf
+  conflicts_with: []
+  skill_target: pdf
+
+# ============================================================
+# SUPPORT persona
+# ============================================================
+
+- id: support-gmail-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Gmail MCP: search_threads for ticket lookup. Structured access beats screenshot parsing.'
+  - 'For support queues, use Gmail MCP search not screenshots. Faster; queryable.'
+  - 'Ticket triage scales when access is structured. Gmail MCP exposes threads as data.'
+  persona: support
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: gmail
+
+- id: support-drive-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Drive MCP for KB file lookup. Search across docs without leaving Claude.'
+  - 'Knowledge-base search via Drive MCP. Saves the round-trip to the browser.'
+  - 'For internal KB references during ticket work, Drive MCP keeps you in flow.'
+  persona: support
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: drive
+
+- id: support-audit-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 21
+  context_conditions: null
+  variants:
+  - '/allostat audit reveals support-rule drift. Stale macros, outdated KB pointers.'
+  - 'Quarterly audit catches stale response templates and broken KB references.'
+  - 'Run /allostat audit when responses start feeling out-of-date. Surfaces what needs refreshing.'
+  persona: support
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+# ============================================================
+# PRODUCT persona
+# ============================================================
+
+- id: product-brainstorm-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - '/superpowers:brainstorming before any feature spec. Explores intent before scope.'
+  - 'Brainstorm phase prevents wrong-feature work. Intent first; spec second.'
+  - 'When the ask is broad, brainstorm-then-spec beats spec-then-revise.'
+  persona: product
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: brainstorming
+
+- id: product-plans-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - '/superpowers:writing-plans for spec/roadmap work. Concrete files + line refs > abstract bullets.'
+  - 'Plans with file paths and acceptance criteria become artifacts. Generic plans become drift.'
+  - 'A product plan should be executable. If a coder can''t pick it up, it''s not a plan yet.'
+  persona: product
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: writing-plans
+
+- id: product-frontend-design-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'frontend-design for mockups + spec illustrations. Polished mocks read as stakeholder-ready.'
+  - 'Wireframes vs polished mocks: polish wins stakeholder buy-in. Use frontend-design.'
+  - 'Mockup quality lowers spec ambiguity. Stakeholders react to images, not bullets.'
+  persona: product
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: frontend-design
+
+- id: product-recall-silos-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'Recall-silos surface prior-case patterns when topic matches fire. Prevents contradicting prior decisions.'
+  - 'Allostat catches "we decided this already" misses. /allostat recall-full shows the depth.'
+  - 'Product work crosses sessions. Recall-silos preserve continuity Allostat would otherwise miss.'
+  persona: product
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+
+# ============================================================
+# EDU persona
+# ============================================================
+
+- id: edu-docx-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/anthropic-skills:docx for curricular handouts and templates. Tracked changes for review cycles.'
+  - 'Word-doc deliverables for educators use docx skill. Direct manipulation; no markdown intermediate.'
+  - 'For syllabus or handout updates, docx preserves formatting through edits.'
+  persona: edu
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: docx
+
+- id: edu-brainstorm-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - '/superpowers:brainstorming before any new lesson or curriculum unit. Intent before structure.'
+  - 'Pedagogical brainstorm phase exposes assumptions. Surface them before lesson-plan drafting.'
+  - 'For new course material, brainstorm-then-plan beats template-fill.'
+  persona: edu
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: brainstorming
+
+- id: edu-frontend-design-001
+  class: always-eligible
+  weight: 3
+  cooldown_days: 14
+  context_conditions: null
+  variants:
+  - 'frontend-design for slide decks, handouts, polished training material. Typography hierarchy aids retention.'
+  - 'Educational deliverables benefit from polish. frontend-design before any printed material.'
+  - 'For training material, design quality is comprehension quality. Don''t skimp on layout.'
+  persona: edu
+  category: discovery
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []
+  skill_target: frontend-design
+
+- id: edu-truthfulness-001
+  class: always-eligible
+  weight: 4
+  cooldown_days: 10
+  context_conditions: null
+  variants:
+  - 'No untruthful claims in educational material. Every cited stat/study/source literally defensible.'
+  - 'Students absorb what you teach. Misstatements compound; verify before lecturing.'
+  - 'Pedagogical integrity: cite primary sources; verify before claiming. Don''t propagate cached errors.'
+  persona: edu
+  category: workflow
+  axis: task_class
+  fires_when: session_start
+  conflicts_with: []

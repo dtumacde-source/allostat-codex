@@ -1,0 +1,105 @@
+id: innate-05
+name: Handoff red-box at 50k/150k/300k/500k/700k/750k token-volume thresholds
+severity: high
+tier: innate
+description: >
+  When session token usage crosses 50k, 150k, 300k, 500k, 700k, or 750k
+  absolute tokens, fire an API-error-style red box recommending the
+  operator request a handoff document. Each threshold fires at most once
+  per session. Severity escalates with the threshold. Token counts come
+  from the transcript JSONL via scripts/token_check.py — always
+  available, no usage-meter dependency.
+
+  Migrated from percentage-based thresholds (33/50/75/90%) per operator
+  directive 2026-05-03: "Address threshold, no longer percentages,
+  thresholds are now token # gated." The free-radical biological
+  metaphor — token accumulation is mitochondrial ROS buildup; sweeps
+  are antioxidant clearance; absolute counts (not percentages) are the
+  natural unit because ROS damage scales with molecule count, not
+  fraction of cellular capacity.
+trigger:
+  match_any:
+    - signal: usage_threshold_crossed
+      threshold: 50000
+    - signal: usage_threshold_crossed
+      threshold: 150000
+    - signal: usage_threshold_crossed
+      threshold: 300000
+    - signal: usage_threshold_crossed
+      threshold: 500000
+    - signal: usage_threshold_crossed
+      threshold: 700000
+    - signal: usage_threshold_crossed
+      threshold: 750000
+response:
+  action: prepend_to_reply
+  display: red_box
+  templates:
+    50000: |
+      ╔══════════════════════════════════════════════════════════════╗
+      ║ ⛔  HANDOFF CHECKPOINT — 50k TOKENS REACHED  ⛔             ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  Status: SESSION WARMING UP — EARLY CHECKPOINT               ║
+      ║  Action: If this is deep work, ask me to write a handoff     ║
+      ║          now. Otherwise this is informational only.          ║
+      ║  Trigger phrase: "write a handoff for this session"          ║
+      ╚══════════════════════════════════════════════════════════════╝
+    150000: |
+      ╔══════════════════════════════════════════════════════════════╗
+      ║ ⛔  HANDOFF CHECKPOINT — 150k TOKENS REACHED  ⛔            ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  Status: 150k MILESTONE — CHECKPOINT WRITTEN                 ║
+      ║  Action: If this session covers important work, ask me to    ║
+      ║          generate a handoff document soon.                   ║
+      ║  Trigger phrase: "write a handoff for this session"          ║
+      ╚══════════════════════════════════════════════════════════════╝
+    300000: |
+      ╔══════════════════════════════════════════════════════════════╗
+      ║ ⛔  HANDOFF CHECKPOINT — 300k TOKENS REACHED  ⛔            ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  Status: 300k — CONSIDER HANDOFF IN NEXT 100k                ║
+      ║  Action: If this session covers important work, ask me to    ║
+      ║          generate a handoff document NOW so the next         ║
+      ║          session can pick it up without loss.                ║
+      ║  Trigger phrase: "write a handoff for this session"          ║
+      ╚══════════════════════════════════════════════════════════════╝
+    500000: |
+      ╔══════════════════════════════════════════════════════════════╗
+      ║ ⛔  HANDOFF CHECKPOINT — 500k TOKENS REACHED  ⛔            ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  Status: HANDOFF STRONGLY RECOMMENDED — STAGE HANDOFF NOW    ║
+      ║  Action: Ask me to write the handoff document this turn.    ║
+      ║          Quality of next-session bootstrap drops past here.  ║
+      ║  Trigger phrase: "write a handoff for this session"          ║
+      ╚══════════════════════════════════════════════════════════════╝
+    700000: |
+      ╔══════════════════════════════════════════════════════════════╗
+      ║ ⛔  HANDOFF CHECKPOINT — 700k — CUTOFF APPROACH  ⛔         ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  Status: CUTOFF APPROACH — NEXT NON-HOUSEKEEPING ACTION      ║
+      ║          WILL BE REFUSED                                     ║
+      ║  Action: Write the handoff IMMEDIATELY. Only housekeeping    ║
+      ║          (handoff doc, memory sweep) is allowed past 700k.  ║
+      ║  Trigger phrase: "write a handoff for this session"          ║
+      ╚══════════════════════════════════════════════════════════════╝
+    750000: |
+      ╔══════════════════════════════════════════════════════════════╗
+      ║ ⛔  FINAL CUTOFF — 750k TOKENS — OPEN NEW SESSION  ⛔       ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  Status: FINAL CUTOFF REACHED                                ║
+      ║  Action: Open a new session and load the handoff doc.       ║
+      ║          This session refuses all non-housekeeping work.    ║
+      ║  Trigger phrase: "/loadhandoff" in next session              ║
+      ╚══════════════════════════════════════════════════════════════╝
+fire_once_per_session: true
+absent_signal_fallback: |
+  Token counts are always available via scripts/token_check.py reading
+  the transcript JSONL — no fallback needed. If token_check fails, the
+  hook surfaces a structured error rather than silently dropping.
+why_high: >
+  Handoff quality drops as token volume climbs. 50k is early enough to
+  capture comprehensive state before drift sets in; 500k/700k/750k
+  escalate urgency so the operator never hits a cutoff without a
+  written handoff in hand. Volume-based thresholds (vs percentage)
+  ensure the rule fires reliably — there is no harness-level
+  usage-meter dependency.
